@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <declare-styleable name="PreviewShadeView">
+        <attr name="shade_radius" format="dimension" />
+        <attr name="shade_background" format="color" />
+        <attr name="shade_x" format="dimension" />
+        <attr name="shade_y" format="dimension" />
+        <attr name="shade_offsetY" format="dimension" />
+    </declare-styleable>
+
+    <declare-styleable name="WheelView">
+        <attr name="wheel_radius" format="integer" />
+        <attr name="wheel_x" format="dimension" />
+        <attr name="wheel_y" format="dimension" />
+        <attr name="wheel_offsetY" format="dimension" />
+        <attr name="wheel_start_color" format="color" />
+        <attr name="wheel_end_color" format="color" />
+    </declare-styleable>
+
+</resources>

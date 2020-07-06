@@ -1,0 +1,10 @@
+<resources>
+    <string name="app_name">business_component_faceverify</string>
+
+    <string name="picture">Picture</string>
+    <string name="description_info">Info</string>
+    <string name="request_permission">This sample needs camera permission.</string>
+    <string name="camera_error">This device doesn\'t support Camera2 API.</string>
+    <string name="module_face_verify_start">开始识别</string>
+    <string name="moduleface_string_start_verify">开始识别</string>
+</resources>

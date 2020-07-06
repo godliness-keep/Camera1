@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <SurfaceView
+        android:id="@+id/surfaceview_camera"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
+    <com.longrise.android.preview.widget.PreviewShadeView
+        android:id="@+id/shade_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
+    <com.longrise.android.preview.widget.WheelView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
+    <TextView
+        android:id="@+id/tv_verify"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|center_horizontal"
+        android:layout_marginBottom="56dp"
+        android:paddingLeft="36dp"
+        android:paddingTop="16dp"
+        android:paddingRight="36dp"
+        android:paddingBottom="16dp"
+        android:text="@string/module_face_verify_start"
+        android:textColor="#FF9600"
+        android:textSize="16sp" />
+
+    <ImageView
+        android:id="@+id/iv_back"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:scaleX="0.5"
+        android:scaleY="0.5"
+        android:src="@drawable/module_face_verify_ic_back" />
+
+
+</FrameLayout>
