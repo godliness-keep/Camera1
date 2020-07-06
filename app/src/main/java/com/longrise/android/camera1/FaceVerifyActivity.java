@@ -43,7 +43,7 @@ public final class FaceVerifyActivity extends AppCompatActivity {
                 .params(mParamsCallback)
                 .previewCallback(mStatusListener)
                 .pictureCallback(null, null, mJpegCallback)
-                .translucentStatus()
+                .translucentStatus() // 如果是沉浸式状态栏
                 .commitAndSaveState(savedInstanceState, Window.ID_ANDROID_CONTENT);
 
     }
