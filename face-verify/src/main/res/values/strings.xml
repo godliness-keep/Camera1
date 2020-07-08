@@ -1,0 +1,14 @@
+<resources>
+    <string name="moduleverify_string_security_verify">通过面部安全识别</string>
+    <string name="moduleverify_string_security_prove">证明是</string>
+    <string name="moduleverify_string_security_exam">本人考试</string>
+    <string name="moduleverify_string_start_verify">开始\n识别</string>
+    <string name="moduleverify_string_tips2">请将正面对准框内并保持光线充足</string>
+    <string name="moduleverify_string_face_verify_title">面部识别</string>
+
+    <string name="moduleverify_string_security_dialog_tips">提示</string>
+    <string name="moduleverify_string_security_dialog_system">需要开启您的相机权限，才可以继续访问，请前往【系统设置】-【权限管理】进行开启</string>
+    <string name="moduleverify_string_security_dialog_confirm">确定</string>
+    <string name="moduleverify_string_security_snackbar_tips">该操作必须要获取您的相机权限</string>
+
+</resources>

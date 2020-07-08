@@ -6,6 +6,7 @@ import android.graphics.ImageFormat;
 import android.hardware.Camera;
 import android.os.Handler;
 import android.os.Message;
+import android.support.annotation.Nullable;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.SurfaceHolder;
@@ -27,11 +28,15 @@ public final class CameraPreview extends SurfaceView implements Handler.Callback
 
     private Camera mCamera;
     private Handler mHandler;
+    @Nullable
     private SensorController mSensorController;
 
     private CameraConfig mConfig;
     private int mOrientation;
+
     private Camera.AutoFocusCallback mAutoFocusCallback;
+    private Camera.PictureCallback mJpegCallback;
+    private SensorController.CameraFocusListener mCameraFocusListener;
 
     /**
      * 开启预览
@@ -48,14 +53,13 @@ public final class CameraPreview extends SurfaceView implements Handler.Callback
      */
     public void takePicture() {
         if (mCamera != null) {
-            final CameraConfig config = mConfig;
-            if (config.checkTakePicture()) {
-                takePictureOnAutoFocus();
-//                setAutoFocus(getAutoFocusCallback());
+            if (!mConfig.checkTakePicture()) {
+                return;
             }
             if (mSensorController != null) {
                 mSensorController.lockFocus();
             }
+            takePictureOnAutoFocus();
         }
     }
 
@@ -66,6 +70,9 @@ public final class CameraPreview extends SurfaceView implements Handler.Callback
         startPreview();
     }
 
+    /**
+     * 开启自动对焦
+     */
     public void onStart() {
         if (mSensorController != null) {
             mSensorController.onStart();
@@ -73,6 +80,9 @@ public final class CameraPreview extends SurfaceView implements Handler.Callback
         printLog("onStart");
     }
 
+    /**
+     * 停止自动对焦
+     */
     public void onStop() {
         if (mSensorController != null) {
             mSensorController.onStop();
@@ -89,20 +99,12 @@ public final class CameraPreview extends SurfaceView implements Handler.Callback
         if (!(context instanceof Activity)) {
             throw new IllegalArgumentException("The context must be Activity");
         }
-        initPreview(context);
+        initPreview();
     }
 
-    private void initPreview(Context context) {
+    private void initPreview() {
         mHandler = new Handler(this);
         getHolder().addCallback(this);
-        mSensorController = new SensorController(context);
-        mSensorController.setCameraFocusListener(new SensorController.CameraFocusListener() {
-            @Override
-            public void onFocus() {
-                printLog("onFocus");
-                setAutoFocus(null);
-            }
-        });
     }
 
     @Override
@@ -123,13 +125,10 @@ public final class CameraPreview extends SurfaceView implements Handler.Callback
 
     @Override
     public boolean handleMessage(Message msg) {
-        switch (msg.what) {
-            case Status.MSG_START_PREVIEW:
-                handleStartPreview();
-            default:
-                handleError(msg.what, msg.obj);
-                break;
+        if (msg.what == Status.MSG_START_PREVIEW) {
+            handleStartPreview();
         }
+        handleError(msg.what, msg.obj);
         return false;
     }
 
@@ -156,12 +155,6 @@ public final class CameraPreview extends SurfaceView implements Handler.Callback
             } catch (Exception e) {
                 notifyStatusToUser(Status.CAMERA_PREVIEW_FAILED, e);
             }
-
-            if (mConfig.cameraId() == Camera.CameraInfo.CAMERA_FACING_FRONT) {
-                mSensorController.lockFocus();
-            } else {
-                mSensorController.unlockFocus();
-            }
         }
     }
 
@@ -175,10 +168,8 @@ public final class CameraPreview extends SurfaceView implements Handler.Callback
 
             if (mCamera != null) {
                 configPreview();
-
-                if (mSensorController != null) {
-                    mSensorController.resetFocus();
-                }
+                // 根据配置创建自动对焦控制器
+                createSensorControllerFromConfig();
             }
         }
     }
@@ -187,7 +178,6 @@ public final class CameraPreview extends SurfaceView implements Handler.Callback
         if (mCamera != null) {
             notifyStatusToUser(Status.MSG_START_PREVIEW);
         }
-        setAutoFocus(null);
     }
 
     private void destroyCamera() {
@@ -211,6 +201,9 @@ public final class CameraPreview extends SurfaceView implements Handler.Callback
             } catch (Exception e) {
                 notifyStatusToUser(Status.CAMERA_PREVIEW_FAILED, e);
             }
+
+            // 首次打开时对焦
+            setAutoFocus(null);
         }
     }
 
@@ -237,29 +230,12 @@ public final class CameraPreview extends SurfaceView implements Handler.Callback
         toUser.sendToTarget();
     }
 
-    private Camera.AutoFocusCallback getAutoFocusCallback() {
-        if (mAutoFocusCallback == null) {
-            mAutoFocusCallback = new Camera.AutoFocusCallback() {
-                @Override
-                public void onAutoFocus(boolean success, Camera camera) {
-                    if (success) {
-                        takePictureOnAutoFocus();
-                    } else {
-                        notifyStatusToUser(Status.MSG_AUTO_FOCUS_FAILED, "Take picture auto focus failed");
-                    }
-                }
-            };
-        }
-        return mAutoFocusCallback;
-    }
-
     private void takePictureOnAutoFocus() {
         final CameraConfig config = this.mConfig;
         final Camera.ShutterCallback shutterCallback = config.mShutterCallback;
         final Camera.PictureCallback rawCallback = config.mRawCallback;
-        final Camera.PictureCallback jpeg = config.mJpegCallback;
         try {
-            mCamera.takePicture(shutterCallback, rawCallback, jpeg);
+            mCamera.takePicture(shutterCallback, rawCallback, getJpegCallback());
         } catch (Exception e) {
             notifyStatusToUser(Status.CAMERA_TAKE_PICTURE_FAILED, e);
         }
@@ -313,6 +289,74 @@ public final class CameraPreview extends SurfaceView implements Handler.Callback
                 notifyStatusToUser(Status.MSG_AUTO_FOCUS_FAILED, e);
             }
         }
+    }
+
+    /**
+     * 根据配置决定是否要创建自动对焦控制器
+     */
+    private void createSensorControllerFromConfig() {
+        if (mConfig.cameraId() == Camera.CameraInfo.CAMERA_FACING_BACK) {
+            if (mSensorController == null) {
+                mSensorController = new SensorController(getContext());
+                mSensorController.setCameraFocusListener(getCameraFocusListener());
+                mSensorController.onStart();
+            } else {
+                mSensorController.unlockFocus();
+                mSensorController.resetFocus();
+            }
+        } else {
+            if (mSensorController != null) {
+                mSensorController.lockFocus();
+            }
+        }
+        printLog("createSensorControllerFromConfig");
+    }
+
+    private SensorController.CameraFocusListener getCameraFocusListener() {
+        if (mCameraFocusListener == null) {
+            mCameraFocusListener = new SensorController.CameraFocusListener() {
+                @Override
+                public void onFocus() {
+                    setAutoFocus(null);
+                    printLog("onFocus");
+                }
+            };
+        }
+        return mCameraFocusListener;
+    }
+
+    private Camera.PictureCallback getJpegCallback() {
+        if (mJpegCallback == null) {
+            mJpegCallback = new Camera.PictureCallback() {
+                @Override
+                public void onPictureTaken(byte[] data, Camera camera) {
+                    if (mSensorController != null) {
+                        mSensorController.unlockFocus();
+                    }
+                    final JpegCallback jpegCallback = mConfig.mJpegCallback;
+                    if (jpegCallback != null) {
+                        jpegCallback.onJpegTaken(data, camera);
+                    }
+                }
+            };
+        }
+        return mJpegCallback;
+    }
+
+    private Camera.AutoFocusCallback getAutoFocusCallback() {
+        if (mAutoFocusCallback == null) {
+            mAutoFocusCallback = new Camera.AutoFocusCallback() {
+                @Override
+                public void onAutoFocus(boolean success, Camera camera) {
+                    if (success) {
+                        takePictureOnAutoFocus();
+                    } else {
+                        notifyStatusToUser(Status.MSG_AUTO_FOCUS_FAILED, "Take picture auto focus failed");
+                    }
+                }
+            };
+        }
+        return mAutoFocusCallback;
     }
 
     private void printLog(String msg) {

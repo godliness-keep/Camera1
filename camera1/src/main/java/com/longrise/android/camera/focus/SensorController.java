@@ -55,16 +55,20 @@ public final class SensorController implements FocusActivityLifiCycle, SensorEve
 
     @Override
     public void onStart() {
-        resetParams();
-        mCanFocus = true;
-        mSensorManager.registerListener(this, mSensor,
-                SensorManager.SENSOR_DELAY_NORMAL);
+        if (!mCanFocus) {
+            mCanFocus = true;
+            resetParams();
+            mSensorManager.registerListener(this, mSensor,
+                    SensorManager.SENSOR_DELAY_NORMAL);
+        }
     }
 
     @Override
     public void onStop() {
-        mSensorManager.unregisterListener(this, mSensor);
-        mCanFocus = false;
+        if (mCanFocus) {
+            mCanFocus = false;
+            mSensorManager.unregisterListener(this, mSensor);
+        }
     }
 
     @Override

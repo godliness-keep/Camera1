@@ -13,7 +13,7 @@ public final class CameraConfig {
 
     Camera.ShutterCallback mShutterCallback;
     Camera.PictureCallback mRawCallback;
-    Camera.PictureCallback mJpegCallback;
+    JpegCallback mJpegCallback;
 
     PreviewStatusListener mStateListener;
     ParamsCallback mParamsListener;
@@ -37,7 +37,7 @@ public final class CameraConfig {
     public CameraConfig takePicture(
             Camera.ShutterCallback shutterCallback,
             Camera.PictureCallback rawCallback,
-            Camera.PictureCallback jpegCallback) {
+            JpegCallback jpegCallback) {
         this.mShutterCallback = shutterCallback;
         this.mRawCallback = rawCallback;
         this.mJpegCallback = jpegCallback;

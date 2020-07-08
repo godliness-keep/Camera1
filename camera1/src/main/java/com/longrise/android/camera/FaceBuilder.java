@@ -7,6 +7,7 @@ import android.support.annotation.IdRes;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
 
+import com.longrise.android.camera.preview.JpegCallback;
 import com.longrise.android.camera.preview.Status;
 import com.longrise.android.camera.preview.ParamsCallback;
 import com.longrise.android.camera.preview.PreviewProxy;
@@ -22,7 +23,7 @@ public final class FaceBuilder {
 
     Camera.ShutterCallback mShutterCallback;
     Camera.PictureCallback mRawCallback;
-    Camera.PictureCallback mJpegCallback;
+    JpegCallback mJpegCallback;
     PreviewStatusListener mStatusCallback;
     boolean mTranslucentStatus;
 
@@ -58,7 +59,7 @@ public final class FaceBuilder {
     public FaceBuilder pictureCallback(
             Camera.ShutterCallback shutterCallback,
             Camera.PictureCallback rawCallback,
-            Camera.PictureCallback takeCallback) {
+            JpegCallback takeCallback) {
         this.mShutterCallback = shutterCallback;
         this.mRawCallback = rawCallback;
         this.mJpegCallback = takeCallback;
