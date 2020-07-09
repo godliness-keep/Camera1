@@ -76,6 +76,7 @@ public class MainActivity extends AppCompatActivity {
                 Log.e(TAG, "onUploadFacePhoto");
 
                 // todo 在这里完成图片上传工作
+
             }
         });
     }

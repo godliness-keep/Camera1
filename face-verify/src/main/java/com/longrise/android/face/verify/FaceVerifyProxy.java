@@ -58,7 +58,7 @@ public final class FaceVerifyProxy implements Handler.Callback {
         return true;
     }
 
-    private void queryMatchResult(int id, int delayTime) {
+    private void queryMatchResult(String id, int delayTime) {
         final Message queryMsg = mHandler.obtainMessage(MSG_QUERY_MATCH_STATE);
         queryMsg.obj = id;
         mHandler.sendMessageDelayed(queryMsg, delayTime);
@@ -68,7 +68,7 @@ public final class FaceVerifyProxy implements Handler.Callback {
         if (mUploadCallback == null) {
             mUploadCallback = new FaceUploadCallback() {
                 @Override
-                public void uploadFaceSuccess(int id) {
+                public void uploadFaceSuccess(String id) {
                     queryMatchResult(id, mDelayRetrys[0]);
                     printLog("uploadFaceSuccess");
                 }
@@ -113,10 +113,10 @@ public final class FaceVerifyProxy implements Handler.Callback {
                 }
 
                 @Override
-                public void retryGetMatchState(int id, String msg) {
+                public void retryGetMatchState(String id, String msg) {
                     if (mRetryCount < MAX_QUERY_COUNT) {
                         mRetryCount++;
-                        queryMatchResult(MSG_QUERY_MATCH_STATE, mDelayRetrys[mRetryCount]);
+                        queryMatchResult(id, mDelayRetrys[mRetryCount]);
                     } else {
                         if (!mDestroy) {
                             if (mProxyListener != null) {
@@ -156,7 +156,7 @@ public final class FaceVerifyProxy implements Handler.Callback {
         /**
          * 通知上传成功
          */
-        void uploadFaceSuccess(int id);
+        void uploadFaceSuccess(String id);
 
         /**
          * 上传失败
@@ -179,7 +179,7 @@ public final class FaceVerifyProxy implements Handler.Callback {
         /**
          * 重新尝试
          */
-        void retryGetMatchState(int id, String msg);
+        void retryGetMatchState(String id, String msg);
     }
 
     private void printLog(String msg) {
