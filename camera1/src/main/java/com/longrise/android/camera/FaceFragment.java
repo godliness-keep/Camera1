@@ -55,7 +55,7 @@ public final class FaceFragment extends Fragment implements PreviewProxy, View.O
     @Override
     public void notifyVerifySuccess(String... msg) {
         stopWheel();
-        setTips(tipToString());
+        setTips(tipToString(msg));
         hideTakePicture();
     }
 
