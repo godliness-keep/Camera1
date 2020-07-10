@@ -15,6 +15,7 @@ import android.view.WindowManager;
 
 import com.longrise.android.camera.CameraParams;
 import com.longrise.android.camera.FaceBuilder;
+import com.longrise.android.camera.FaceFragment;
 import com.longrise.android.camera.preview.JpegCallback;
 import com.longrise.android.camera.preview.ParamsCallback;
 import com.longrise.android.camera.preview.PreviewProxy;
@@ -34,6 +35,7 @@ public final class FaceVerifyActivity extends AppCompatActivity {
     private FaceVerifyProxy mVerifyProxy;
 
     private int mFaceCompare;
+    private Runnable mDelayResult;
 
     /**
      * 开启面部识别
@@ -100,8 +102,15 @@ public final class FaceVerifyActivity extends AppCompatActivity {
             /**
              * 验证成功*/
             @Override
-            public void verifySuccess() {
-                setSuccessToResult();
+            public void verifySuccess(String... msg) {
+                if (msg == null || msg.length <= 0) {
+                    setSuccessToResult();
+                } else {
+                    if (mProxy != null) {
+                        mProxy.notifyVerifySuccess(msg);
+                    }
+                    delaySetSuccessToResult();
+                }
             }
         });
     }
@@ -114,18 +123,12 @@ public final class FaceVerifyActivity extends AppCompatActivity {
         @Override
         public CameraParams params() {
             final CameraParams params = new CameraParams();
+            params.mCameraId = Camera.CameraInfo.CAMERA_FACING_FRONT;
             params.mPictureWidth = 640;
             params.mPictureHeight = 480;
             return params;
         }
     };
-
-    private void setSuccessToResult() {
-        final Intent intent = new Intent();
-        intent.putExtra(VerifyConsts.RESULT_VERIFY_STATUS, true);
-        setResult(Activity.RESULT_OK, intent);
-        finish();
-    }
 
     /**
      * 拍照回调
@@ -135,6 +138,7 @@ public final class FaceVerifyActivity extends AppCompatActivity {
         public void onJpegTaken(byte[] data, Camera camera) {
             if (mProxy != null) {
                 mProxy.restartPreview();
+                mProxy.hideTakePicture();
             }
 
             if (mVerifyProxy != null) {
@@ -182,6 +186,34 @@ public final class FaceVerifyActivity extends AppCompatActivity {
             window.setStatusBarColor(Color.TRANSPARENT);
             window.setNavigationBarColor(Color.TRANSPARENT);
         }
+    }
+
+    private void setSuccessToResult() {
+        final Intent intent = new Intent();
+        intent.putExtra(VerifyConsts.RESULT_VERIFY_STATUS, true);
+        setResult(Activity.RESULT_OK, intent);
+        finish();
+    }
+
+
+    private Runnable getDelayResult() {
+        if (mDelayResult == null) {
+            mDelayResult = new Runnable() {
+                @Override
+                public void run() {
+                    setSuccessToResult();
+                }
+            };
+        }
+        return mDelayResult;
+    }
+
+    private void delaySetSuccessToResult() {
+        final View temp = findViewById(Window.ID_ANDROID_CONTENT);
+        if (mDelayResult != null) {
+            temp.removeCallbacks(mDelayResult);
+        }
+        temp.postDelayed(getDelayResult(), PreviewProxy.TIP_TIME_OUT);
     }
 
     private void getExtraData() {

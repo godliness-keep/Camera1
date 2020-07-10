@@ -2,6 +2,7 @@ package com.longrise.android.camera1;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
@@ -63,10 +64,16 @@ public class MainActivity extends AppCompatActivity {
     private void registerListener() {
         FaceMatchRegistry.getRegistry().registerMatchListener(new FaceMatchRegistry.FaceMatchListener() {
             @Override
-            public void onMatchResult(String id, FaceVerifyProxy.FaceMatchCallback callback) {
+            public void onMatchResult(String id, final FaceVerifyProxy.FaceMatchCallback callback) {
                 Log.e(TAG, "onMatchResult");
 
                 // todo 在这里完成查询匹配结果
+                new Handler().postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        callback.faceMatchSuccess("匹配成功，给个提示信息");
+                    }
+                }, 2000);
             }
         });
 
@@ -76,6 +83,7 @@ public class MainActivity extends AppCompatActivity {
                 Log.e(TAG, "onUploadFacePhoto");
 
                 // todo 在这里完成图片上传工作
+                callback.uploadFaceSuccess("12345");
 
             }
         });

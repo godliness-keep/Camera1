@@ -40,12 +40,23 @@ public final class FaceFragment extends Fragment implements PreviewProxy, View.O
     }
 
     /**
-     * 通知面部识别失败
+     * 通知面部匹配失败
      */
     @Override
     public void notifyVerifyFailed(String msg) {
         stopWheel();
         setTips(msg);
+        resetTakePicture();
+    }
+
+    /**
+     * 通知面部匹配成功
+     */
+    @Override
+    public void notifyVerifySuccess(String... msg) {
+        stopWheel();
+        setTips(tipToString());
+        hideTakePicture();
     }
 
     /**
@@ -55,6 +66,16 @@ public final class FaceFragment extends Fragment implements PreviewProxy, View.O
     public void restartPreview() {
         if (mPreview != null) {
             mPreview.restartPreview();
+        }
+    }
+
+    /**
+     * 隐藏拍照
+     */
+    @Override
+    public void hideTakePicture() {
+        if (mTakePicture != null) {
+            mTakePicture.setVisibility(View.GONE);
         }
     }
 
@@ -161,12 +182,7 @@ public final class FaceFragment extends Fragment implements PreviewProxy, View.O
 
         @Override
         public CameraParams params() {
-            final CameraParams params = new CameraParams();
-            params.mCameraId = mParams.mCameraId;
-            params.mPictureWidth = mParams.mPictureWidth;
-            params.mPictureHeight = mParams.mPictureHeight;
-            params.mImageQuality = mParams.mImageQuality;
-            return params;
+            return mParams;
         }
     }
 
@@ -188,10 +204,9 @@ public final class FaceFragment extends Fragment implements PreviewProxy, View.O
                 mTips.setBackground(null);
             } else {
                 removeTips();
-                resetTakeStatus();
                 mTips.setText(msg);
                 mTips.setBackground(getResources().getDrawable(R.drawable.moduleface_shape_verify_fail));
-                mTips.postDelayed(getTipRunnable(), 3000);
+                mTips.postDelayed(getTipRunnable(), TIP_TIME_OUT);
             }
         }
     }
@@ -224,9 +239,22 @@ public final class FaceFragment extends Fragment implements PreviewProxy, View.O
         }
     }
 
-    private void resetTakeStatus() {
+    private void resetTakePicture() {
         if (mTakePicture != null) {
+            mTakePicture.setVisibility(View.VISIBLE);
             mTakePicture.setText(getString(R.string.modulecamera_reset_take));
         }
+    }
+
+    private String tipToString(String... msg) {
+        final int length;
+        if (msg == null || (length = msg.length) <= 0) {
+            return null;
+        }
+        final StringBuilder b = new StringBuilder();
+        for (int i = 0; i < length; i++) {
+            b.append(msg[i]);
+        }
+        return b.toString();
     }
 }

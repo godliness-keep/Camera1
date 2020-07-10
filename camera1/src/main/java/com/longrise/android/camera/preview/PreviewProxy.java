@@ -7,8 +7,18 @@ package com.longrise.android.camera.preview;
  */
 public interface PreviewProxy {
 
+    /**
+     * 提示超时时间
+     */
+    int TIP_TIME_OUT = 3000;
+    /**
+     * 保存状态key
+     */
     String KEY = "Preview-Fragment";
 
+    /**
+     * 手动对焦
+     */
     void setAutoFocus();
 
     /**
@@ -17,7 +27,17 @@ public interface PreviewProxy {
     void restartPreview();
 
     /**
-     * 通知识别失败
+     * 隐藏拍照
+     */
+    void hideTakePicture();
+
+    /**
+     * 通知匹配失败
      */
     void notifyVerifyFailed(String msg);
+
+    /**
+     * 通知匹配成功
+     */
+    void notifyVerifySuccess(String... msg);
 }

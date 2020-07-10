@@ -69,17 +69,23 @@ public final class FaceVerifyProxy implements Handler.Callback {
             mUploadCallback = new FaceUploadCallback() {
                 @Override
                 public void uploadFaceSuccess(String id) {
+                    if (mDestroy) {
+                        return;
+                    }
                     queryMatchResult(id, mDelayRetrys[0]);
+
                     printLog("uploadFaceSuccess");
                 }
 
                 @Override
                 public void uploadFaceFailed(String msg) {
-                    if (!mDestroy) {
-                        if (mProxyListener != null) {
-                            mProxyListener.verifyFailed(msg);
-                        }
+                    if (mDestroy) {
+                        return;
                     }
+                    if (mProxyListener != null) {
+                        mProxyListener.verifyFailed(msg);
+                    }
+
                     printLog("uploadFaceFailed");
                 }
             };
@@ -91,11 +97,12 @@ public final class FaceVerifyProxy implements Handler.Callback {
         if (mMatchCallback == null) {
             mMatchCallback = new FaceMatchCallback() {
                 @Override
-                public void faceMatchSuccess() {
-                    if (!mDestroy) {
-                        if (mProxyListener != null) {
-                            mProxyListener.verifySuccess();
-                        }
+                public void faceMatchSuccess(String... msg) {
+                    if (mDestroy) {
+                        return;
+                    }
+                    if (mProxyListener != null) {
+                        mProxyListener.verifySuccess(msg);
                     }
 
                     printLog("faceMatchSuccess: " + mRetryCount);
@@ -103,10 +110,11 @@ public final class FaceVerifyProxy implements Handler.Callback {
 
                 @Override
                 public void faceMatchFailed(String msg) {
-                    if (!mDestroy) {
-                        if (mProxyListener != null) {
-                            mProxyListener.verifyFailed(msg);
-                        }
+                    if (mDestroy) {
+                        return;
+                    }
+                    if (mProxyListener != null) {
+                        mProxyListener.verifyFailed(msg);
                     }
 
                     printLog("faceMatchFailed: " + mRetryCount);
@@ -114,14 +122,15 @@ public final class FaceVerifyProxy implements Handler.Callback {
 
                 @Override
                 public void retryGetMatchState(String id, String msg) {
+                    if (mDestroy) {
+                        return;
+                    }
                     if (mRetryCount < MAX_QUERY_COUNT) {
                         mRetryCount++;
                         queryMatchResult(id, mDelayRetrys[mRetryCount]);
                     } else {
-                        if (!mDestroy) {
-                            if (mProxyListener != null) {
-                                mProxyListener.verifyTimeout();
-                            }
+                        if (mProxyListener != null) {
+                            mProxyListener.verifyTimeout();
                         }
                         mRetryCount = 0;
                     }
@@ -148,7 +157,7 @@ public final class FaceVerifyProxy implements Handler.Callback {
         /**
          * 识别成功
          */
-        void verifySuccess();
+        void verifySuccess(String... msg);
     }
 
     public interface FaceUploadCallback {
@@ -169,7 +178,7 @@ public final class FaceVerifyProxy implements Handler.Callback {
         /**
          * 匹配成功
          */
-        void faceMatchSuccess();
+        void faceMatchSuccess(String... msg);
 
         /**
          * 匹配失败
