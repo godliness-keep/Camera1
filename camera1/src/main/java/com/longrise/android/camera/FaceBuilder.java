@@ -3,6 +3,8 @@ package com.longrise.android.camera;
 import android.hardware.Camera;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Message;
+import android.os.Messenger;
 import android.support.annotation.IdRes;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;

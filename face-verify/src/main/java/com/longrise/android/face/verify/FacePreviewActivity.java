@@ -87,13 +87,15 @@ public final class FacePreviewActivity extends AppCompatActivity implements View
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         if (requestCode == REQUEST_CAMERA_PERMISSION) {
             if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                // 权限被授予
                 startVerify();
             } else {
                 if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.CAMERA)) {
-                    // 如果用户拒绝过
+                    // 需要给用户进一步解释为什么要使用该权限
                     showRequestPermissionRationale();
                 } else {
-                    // 如果用户勾选不在提示
+                    // 此时可以肯定用户已经勾选了不再提示
+                    // 提示用户如果想再次申请，只能去系统设置中开启
                     showSystemSetting();
                 }
             }
@@ -104,9 +106,7 @@ public final class FacePreviewActivity extends AppCompatActivity implements View
     public void onClick(View v) {
         final int id = v.getId();
         if (id == R.id.tv_start_verify) {
-            if (beforStartVerify()) {
-                startVerify();
-            }
+            beforeStartVerify();
         } else if (id == R.id.iv_back_face_preview) {
             finish();
         }
@@ -194,14 +194,30 @@ public final class FacePreviewActivity extends AppCompatActivity implements View
                 }).show();
     }
 
-    private boolean beforStartVerify() {
+    private void beforeStartVerify() {
+        requesCameratPermissions(new PermissionCallback() {
+            @Override
+            public void onGranted() {
+                startVerify();
+            }
+        });
+    }
+
+    public interface PermissionCallback {
+
+        void onGranted();
+    }
+
+    private void requesCameratPermissions(PermissionCallback callback) {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
-            return true;
+            callback.onGranted();
         }
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED) {
-            return true;
+
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA)
+                == PackageManager.PERMISSION_GRANTED) {
+            callback.onGranted();
         }
-        ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CAMERA}, REQUEST_CAMERA_PERMISSION);
-        return false;
+        ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CAMERA},
+                REQUEST_CAMERA_PERMISSION);
     }
 }

@@ -15,7 +15,6 @@ import android.view.WindowManager;
 
 import com.longrise.android.camera.CameraParams;
 import com.longrise.android.camera.FaceBuilder;
-import com.longrise.android.camera.FaceFragment;
 import com.longrise.android.camera.preview.JpegCallback;
 import com.longrise.android.camera.preview.ParamsCallback;
 import com.longrise.android.camera.preview.PreviewProxy;
@@ -123,9 +122,7 @@ public final class FaceVerifyActivity extends AppCompatActivity {
         @Override
         public CameraParams params() {
             final CameraParams params = new CameraParams();
-            params.mCameraId = Camera.CameraInfo.CAMERA_FACING_FRONT;
-            params.mPictureWidth = 640;
-            params.mPictureHeight = 480;
+            params.mCameraId = Camera.CameraInfo.CAMERA_FACING_BACK;
             return params;
         }
     };

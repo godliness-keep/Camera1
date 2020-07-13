@@ -150,7 +150,7 @@ public final class FaceVerifyProxy implements Handler.Callback {
         void verifyTimeout();
 
         /**
-         * 失败失败，可能是网络、也可能服务
+         * 识别失败，可能是网络、也可能服务
          */
         void verifyFailed(String msg);
 

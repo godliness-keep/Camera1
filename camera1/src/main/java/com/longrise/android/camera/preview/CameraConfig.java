@@ -1,6 +1,7 @@
 package com.longrise.android.camera.preview;
 
 import android.hardware.Camera;
+import android.support.annotation.NonNull;
 
 import com.longrise.android.camera.CameraParams;
 
@@ -17,6 +18,7 @@ public final class CameraConfig {
 
     PreviewStatusListener mStateListener;
     ParamsCallback mParamsListener;
+    Camera.PreviewCallback mPreviewCallback;
 
     private CameraParams mParams;
 
@@ -52,20 +54,17 @@ public final class CameraConfig {
         return this;
     }
 
-    int cameraId() {
-        return cameraParams().mCameraId;
+    /**
+     * 预览回调
+     */
+    public CameraConfig previewCallback(Camera.PreviewCallback previewCallback) {
+        this.mPreviewCallback = previewCallback;
+        return this;
     }
 
-    int pictureWidth() {
-        return cameraParams().mPictureWidth;
-    }
-
-    int pictureHeight() {
-        return cameraParams().mPictureHeight;
-    }
-
-    int imageQuality() {
-        return cameraParams().mImageQuality;
+    @NonNull
+    CameraParams params() {
+        return cameraParams();
     }
 
     boolean checkTakePicture() {

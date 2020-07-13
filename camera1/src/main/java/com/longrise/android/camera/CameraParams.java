@@ -14,24 +14,33 @@ public final class CameraParams implements Parcelable {
     public static final String EXTRA_PREVIEW_PARAMS = "extra_preview_params";
 
     /**
-     * 打开的相机ID
+     * 相机ID
      */
     public int mCameraId = Camera.CameraInfo.CAMERA_FACING_BACK;
-
     /**
-     * 图片宽度
+     * 拍照图片宽度
      */
     public int mPictureWidth = 640;
-
     /**
-     * 图片高度
+     * 拍照图片高度
      */
     public int mPictureHeight = 480;
-
     /**
-     * 图片的质量
+     * 拍照图片质量
      */
     public int mImageQuality = 100;
+    /**
+     * 最小预览帧率
+     */
+    public int mMinFps;
+    /**
+     * 最大预览帧率
+     */
+    public int mMaxFps;
+    /**
+     * 对焦模式
+     */
+    public String mFocusMode = Camera.Parameters.FOCUS_MODE_AUTO;
 
     public CameraParams() {
 
@@ -42,6 +51,9 @@ public final class CameraParams implements Parcelable {
         mPictureWidth = in.readInt();
         mPictureHeight = in.readInt();
         mImageQuality = in.readInt();
+        mMinFps = in.readInt();
+        mMaxFps = in.readInt();
+        mFocusMode = in.readString();
     }
 
     @Override
@@ -50,6 +62,9 @@ public final class CameraParams implements Parcelable {
         dest.writeInt(mPictureWidth);
         dest.writeInt(mPictureHeight);
         dest.writeInt(mImageQuality);
+        dest.writeInt(mMinFps);
+        dest.writeInt(mMaxFps);
+        dest.writeString(mFocusMode);
     }
 
     @Override

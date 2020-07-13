@@ -10,7 +10,6 @@ import android.util.Log;
 import android.view.View;
 
 import com.longrise.android.face.verify.FaceMatchRegistry;
-import com.longrise.android.face.verify.FacePreviewActivity;
 import com.longrise.android.face.verify.FaceVerifyActivity;
 import com.longrise.android.face.verify.FaceVerifyProxy;
 import com.longrise.android.face.verify.common.VerifyConsts;
@@ -38,10 +37,22 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 // 需要先开启预览效果
-                FacePreviewActivity.openFacePreview(MainActivity.this, null, "godliness", 80);
-                registerListener();
+//                FacePreviewActivity.openFacePreview(MainActivity.this, null, "godliness", 80);
+//                registerListener();
+
+                final Bundle extra = new Bundle();
+                extra.putString("godliness", "12345，上山打老虎");
+                UserClient.getClient().sendMessage(extra, MainActivity.this);
+
             }
         });
+
+        Log.e(TAG, "onCreate");
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
     }
 
     @Override
@@ -88,4 +99,5 @@ public class MainActivity extends AppCompatActivity {
             }
         });
     }
+
 }

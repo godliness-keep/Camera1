@@ -1,6 +1,9 @@
 package com.longrise.android.camera.preview;
 
 import android.app.Activity;
+import android.app.admin.DevicePolicyManager;
+import android.content.Context;
+import android.graphics.ImageFormat;
 import android.hardware.Camera;
 import android.media.ExifInterface;
 import android.support.annotation.Nullable;
@@ -42,6 +45,54 @@ public final class CameraProxy {
             }
         }
         return bestSize;
+    }
+
+    public static int getSupportPreviewFormat(Camera.Parameters parameters) {
+        final List<Integer> previewFormats = parameters.getSupportedPreviewFormats();
+        int nv21 = ImageFormat.UNKNOWN;
+        int yv12 = ImageFormat.UNKNOWN;
+        for (Integer format : previewFormats) {
+            if (format == ImageFormat.NV21) {
+                nv21 = ImageFormat.NV21;
+            } else if (format == ImageFormat.YV12) {
+                yv12 = ImageFormat.YV12;
+            }
+        }
+        return nv21 != -1 ? nv21 : yv12;
+    }
+
+    public static String getSupportFocusMode(Camera.Parameters parameters, String expectMode) {
+        final List<String> supportedFocusModes = parameters.getSupportedFocusModes();
+        if (supportedFocusModes.contains(expectMode)) {
+            return expectMode;
+        }
+        if (supportedFocusModes.contains(Camera.Parameters.FOCUS_MODE_AUTO)) {
+            return Camera.Parameters.FOCUS_MODE_AUTO;
+        }
+        return supportedFocusModes.get(0);
+    }
+
+//    public static int[] getSupportedPreviewFpsRange(Camera.Parameters parameters, int min, int max) {
+//        final List<int[]> fpsRanges = parameters.getSupportedPreviewFpsRange();
+//        parameters.getSupportedPreviewFrameRates();
+//
+//    }
+
+    public static int getSupportedPreviewFrameRates(Camera.Parameters parameters, int frameRate) {
+        final List<Integer> rates = parameters.getSupportedPreviewFrameRates();
+        if (rates.contains(frameRate)) {
+            return frameRate;
+        }
+        int fitDiff = Integer.MAX_VALUE;
+        int fitRate = 0;
+        for (Integer rate : rates) {
+            final int currentDiff = Math.abs(rate - frameRate);
+            if (currentDiff < fitDiff) {
+                fitDiff = currentDiff;
+                fitRate = rate;
+            }
+        }
+        return fitRate;
     }
 
     public static int getDisplayOrientation(Activity host,
@@ -121,4 +172,11 @@ public final class CameraProxy {
         }
         return degree;
     }
+
+    public static boolean checkCameraService(Context context) {
+        final DevicePolicyManager dpm = (DevicePolicyManager) context.getSystemService(Context.DEVICE_POLICY_SERVICE);
+        return !dpm.getCameraDisabled(null);
+    }
+
+
 }
