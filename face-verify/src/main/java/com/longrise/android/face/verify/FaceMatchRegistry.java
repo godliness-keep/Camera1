@@ -1,7 +1,6 @@
 package com.longrise.android.face.verify;
 
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 
 /**
  * Created by godliness on 2020-07-07.

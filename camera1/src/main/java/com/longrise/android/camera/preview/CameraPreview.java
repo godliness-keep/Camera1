@@ -192,7 +192,6 @@ public final class CameraPreview extends SurfaceView implements Handler.Callback
 
     private void handleStartPreview() {
         if (mCamera != null) {
-            beforeStartPreview();
             try {
                 mCamera.setDisplayOrientation(mOrientation);
                 mCamera.startPreview();
@@ -204,11 +203,11 @@ public final class CameraPreview extends SurfaceView implements Handler.Callback
         }
     }
 
-    private void beforeStartPreview() {
+    private void setPreviewCallback(int width, int height) {
         try {
-            final Camera.PreviewCallback previewCallback = mConfig.mPreviewCallback;
+            final PreviewFrameCallback previewCallback = mConfig.mPreviewCallback;
             if (previewCallback != null) {
-                mCamera.setPreviewCallback(previewCallback);
+                mCamera.setPreviewCallback(new PreviewFrame(width, height, previewCallback));
             }
         } catch (Exception e) {
             notifyStatusToUser(Status.CAMERA_SET_PREVIEW_FAILED, e);
@@ -254,6 +253,8 @@ public final class CameraPreview extends SurfaceView implements Handler.Callback
         final int height = getHeight();
         final Camera.Size size = CameraProxy.calcOptimaSize(preview.getSupportedPreviewSizes(), width, height);
         preview.setPreviewSize(size.width, size.height);
+        // preview frame callback
+        setPreviewCallback(size.width, size.height);
 
         printLog("configPreviewParameters width: " + size.width + " height: " + size.height);
     }
@@ -264,7 +265,7 @@ public final class CameraPreview extends SurfaceView implements Handler.Callback
         final Camera.Size optimaSize = CameraProxy.calcOptimaSize(capture.getSupportedPictureSizes(), expectWidth, expectHeight);
         capture.setPictureSize(optimaSize.width, optimaSize.height);
         this.mOrientation = CameraProxy.getDisplayOrientation((Activity) getContext(), params().mCameraId);
-        capture.set("rotation", mOrientation);
+        capture.setRotation(mOrientation);
 
         printLog("configCaptureParameters: width: " + optimaSize.width + " height: " + optimaSize.height);
         printLog("rotation: " + mOrientation);

@@ -15,9 +15,9 @@ public final class CameraConfig {
     JpegCallback mJpegCallback;
 
     PreviewStatusListener mStateListener;
-    ParamsCallback mParamsListener;
-    Camera.PreviewCallback mPreviewCallback;
+    PreviewFrameCallback mPreviewCallback;
 
+    private ParamsCallback mParamsListener;
     private CameraParams mParams;
 
     CameraConfig() {
@@ -55,7 +55,7 @@ public final class CameraConfig {
     /**
      * 预览回调
      */
-    public CameraConfig previewCallback(Camera.PreviewCallback previewCallback) {
+    public CameraConfig previewCallback(PreviewFrameCallback previewCallback) {
         this.mPreviewCallback = previewCallback;
         return this;
     }

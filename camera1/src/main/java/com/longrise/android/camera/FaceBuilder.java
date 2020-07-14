@@ -9,6 +9,7 @@ import android.support.v7.app.AppCompatActivity;
 
 import com.longrise.android.camera.preview.CameraParams;
 import com.longrise.android.camera.preview.JpegCallback;
+import com.longrise.android.camera.preview.PreviewFrameCallback;
 import com.longrise.android.camera.preview.Status;
 import com.longrise.android.camera.preview.ParamsCallback;
 import com.longrise.android.camera.preview.PreviewStatusListener;
@@ -25,7 +26,7 @@ public final class FaceBuilder {
     Camera.PictureCallback mRawCallback;
     JpegCallback mJpegCallback;
     PreviewStatusListener mStatusCallback;
-    Camera.PreviewCallback mPreviewCallback;
+    PreviewFrameCallback mPreviewCallback;
     boolean mTranslucentStatus;
 
     private final AppCompatActivity mHost;
@@ -57,7 +58,7 @@ public final class FaceBuilder {
     /**
      * 配置相机预览数据回调
      */
-    public FaceBuilder previewCallback(Camera.PreviewCallback previewCallback) {
+    public FaceBuilder previewCallback(PreviewFrameCallback previewCallback) {
         this.mPreviewCallback = previewCallback;
         return this;
     }

@@ -30,8 +30,6 @@ import com.longrise.android.face.verify.common.VerifyConsts;
  */
 public final class FaceVerifyActivity extends AppCompatActivity {
 
-    private static final String TAG = "FaceVerifyActivity";
-
     private PreviewProxy mProxy;
     private FaceVerifyProxy mVerifyProxy;
 

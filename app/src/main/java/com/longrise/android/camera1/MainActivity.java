@@ -9,6 +9,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 
+import com.longrise.android.camera.preview.CameraConfig;
+import com.longrise.android.camera.preview.CameraPreview;
 import com.longrise.android.face.verify.FaceMatchRegistry;
 import com.longrise.android.face.verify.FacePreviewActivity;
 import com.longrise.android.face.verify.FaceVerifyActivity;
@@ -45,7 +47,13 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        fastExtract();
+        findViewById(R.id.monitor).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                final Intent intent = new Intent(MainActivity.this, MonitoringActivity.class);
+                startActivity(intent);
+            }
+        });
     }
 
     @Override
@@ -53,7 +61,7 @@ public class MainActivity extends AppCompatActivity {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == VerifyConsts.REQUEST_VERIFY_CODE) {
             if (data != null && data.getBooleanExtra(VerifyConsts.RESULT_VERIFY_STATUS, false)) {
-                // todo 此时表明人脸识别通过
+                // todo 识别通过
             }
         }
     }
