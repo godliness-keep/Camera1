@@ -3,16 +3,14 @@ package com.longrise.android.camera;
 import android.hardware.Camera;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Message;
-import android.os.Messenger;
 import android.support.annotation.IdRes;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
 
+import com.longrise.android.camera.preview.CameraParams;
 import com.longrise.android.camera.preview.JpegCallback;
 import com.longrise.android.camera.preview.Status;
 import com.longrise.android.camera.preview.ParamsCallback;
-import com.longrise.android.camera.preview.PreviewProxy;
 import com.longrise.android.camera.preview.PreviewStatusListener;
 
 

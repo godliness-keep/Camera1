@@ -20,10 +20,6 @@
             </intent-filter>
         </activity>
 
-        <service
-            android:name=".MessengerService"
-            android:exported="true"
-            android:process=".msg"/>
     </application>
 
 </manifest>

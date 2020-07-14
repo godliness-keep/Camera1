@@ -13,11 +13,11 @@ import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 
-import com.longrise.android.camera.CameraParams;
+import com.longrise.android.camera.preview.CameraParams;
 import com.longrise.android.camera.FaceBuilder;
 import com.longrise.android.camera.preview.JpegCallback;
 import com.longrise.android.camera.preview.ParamsCallback;
-import com.longrise.android.camera.preview.PreviewProxy;
+import com.longrise.android.camera.PreviewProxy;
 import com.longrise.android.camera.preview.PreviewStatusListener;
 import com.longrise.android.camera.preview.Status;
 import com.longrise.android.face.verify.common.VerifyConsts;
@@ -122,7 +122,7 @@ public final class FaceVerifyActivity extends AppCompatActivity {
         @Override
         public CameraParams params() {
             final CameraParams params = new CameraParams();
-            params.mCameraId = Camera.CameraInfo.CAMERA_FACING_BACK;
+            params.cameraId(Camera.CameraInfo.CAMERA_FACING_BACK);
             return params;
         }
     };

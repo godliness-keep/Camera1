@@ -1,4 +1,4 @@
-package com.longrise.android.camera;
+package com.longrise.android.camera.preview;
 
 import android.hardware.Camera;
 import android.os.Parcel;
@@ -13,34 +13,50 @@ public final class CameraParams implements Parcelable {
 
     public static final String EXTRA_PREVIEW_PARAMS = "extra_preview_params";
 
+    int mCameraId = Camera.CameraInfo.CAMERA_FACING_BACK;
+    int mPictureWidth = 640;
+    int mPictureHeight = 480;
+    int mImageQuality = 100;
+    int mMinFps;
+    int mMaxFps;
+    String mFocusMode = Camera.Parameters.FOCUS_MODE_AUTO;
+
     /**
      * 相机ID
      */
-    public int mCameraId = Camera.CameraInfo.CAMERA_FACING_BACK;
+    public void cameraId(int cameraId) {
+        this.mCameraId = cameraId;
+    }
+
     /**
-     * 拍照图片宽度
+     * 拍照图片尺寸
      */
-    public int mPictureWidth = 640;
-    /**
-     * 拍照图片高度
-     */
-    public int mPictureHeight = 480;
+    public void pictureSize(int width, int height) {
+        this.mPictureWidth = width;
+        this.mPictureHeight = height;
+    }
+
     /**
      * 拍照图片质量
      */
-    public int mImageQuality = 100;
+    public void imageQuality(int imageQuality) {
+        this.mImageQuality = imageQuality;
+    }
+
     /**
-     * 最小预览帧率
+     * 预览帧率，建议最小值不低于24fps，即24000
      */
-    public int mMinFps;
-    /**
-     * 最大预览帧率
-     */
-    public int mMaxFps;
+    public void fpsRange(int min, int max) {
+        this.mMinFps = min;
+        this.mMaxFps = max;
+    }
+
     /**
      * 对焦模式
      */
-    public String mFocusMode = Camera.Parameters.FOCUS_MODE_AUTO;
+    public void focusMode(String focusMode) {
+        this.mFocusMode = focusMode;
+    }
 
     public CameraParams() {
 
@@ -83,4 +99,5 @@ public final class CameraParams implements Parcelable {
             return new CameraParams[size];
         }
     };
+
 }

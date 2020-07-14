@@ -3,8 +3,6 @@ package com.longrise.android.camera.preview;
 import android.hardware.Camera;
 import android.support.annotation.NonNull;
 
-import com.longrise.android.camera.CameraParams;
-
 /**
  * Created by godliness on 2020-07-01.
  *

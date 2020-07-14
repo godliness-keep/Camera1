@@ -13,7 +13,6 @@ import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 
 import com.longrise.android.camera.BuildConfig;
-import com.longrise.android.camera.CameraParams;
 import com.longrise.android.camera.focus.SensorController;
 
 /**
@@ -279,6 +278,12 @@ public final class CameraPreview extends SurfaceView implements Handler.Callback
         basic.setPictureFormat(ImageFormat.JPEG);
         basic.setJpegQuality(params().mImageQuality);
         basic.setFocusMode(CameraProxy.getSupportFocusMode(basic, params().mFocusMode));
+        // set preview fps range[min,max]
+        final int[] fpsRanges = CameraProxy.getSupportedPreviewFpsRange(basic, params().mMinFps, params().mMaxFps);
+        if (fpsRanges != null) {
+            basic.setPreviewFpsRange(fpsRanges[0], fpsRanges[1]);
+            printLog("optima Min: " + fpsRanges[0] + " max: " + fpsRanges[1]);
+        }
 
         configPreviewParameters(basic);
         configCaptureParameters(basic);

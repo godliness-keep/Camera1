@@ -1,4 +1,4 @@
-package com.longrise.android.camera.preview;
+package com.longrise.android.camera;
 
 /**
  * Created by godliness on 2020-06-26.
