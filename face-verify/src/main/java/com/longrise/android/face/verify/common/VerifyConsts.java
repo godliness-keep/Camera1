@@ -12,5 +12,4 @@ public final class VerifyConsts {
 
     public static final String EXTRA_PREVIEW_PATH = "extra_preview_path";
     public static final String EXTRA_PREVIEW_NAME = "extra_preview_name";
-    public static final String EXTRA_FACE_COMPARE = "face_compare";
 }

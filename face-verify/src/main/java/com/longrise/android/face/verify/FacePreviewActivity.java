@@ -43,19 +43,16 @@ public final class FacePreviewActivity extends AppCompatActivity implements View
 
     private String mName;
     private String mPreviewPath;
-    private int mFaceCompare;
 
     /**
      * 开启面部预览
      *
      * @param previewPath 预览的图片地址
      * @param name        名字
-     * @param faceCompare 比对率
      */
-    public static void openFacePreview(Activity host, String previewPath, String name, int faceCompare) {
+    public static void openFacePreview(Activity host, String previewPath, String name) {
         final Intent intent = new Intent(host, FacePreviewActivity.class);
         intent.putExtra(VerifyConsts.EXTRA_PREVIEW_PATH, previewPath);
-        intent.putExtra(VerifyConsts.EXTRA_FACE_COMPARE, faceCompare);
         intent.putExtra(VerifyConsts.EXTRA_PREVIEW_NAME, name);
         host.startActivityForResult(intent, VerifyConsts.REQUEST_VERIFY_CODE);
     }
@@ -140,7 +137,7 @@ public final class FacePreviewActivity extends AppCompatActivity implements View
     }
 
     private void startVerify() {
-        FaceVerifyActivity.openFaceVerify(this, mFaceCompare);
+        FaceVerifyActivity.openFaceVerify(this);
     }
 
     private void bindData() {
@@ -168,7 +165,6 @@ public final class FacePreviewActivity extends AppCompatActivity implements View
         final Intent intent = getIntent();
         this.mPreviewPath = intent.getStringExtra(VerifyConsts.EXTRA_PREVIEW_PATH);
         this.mName = intent.getStringExtra(VerifyConsts.EXTRA_PREVIEW_NAME);
-        this.mFaceCompare = intent.getIntExtra(VerifyConsts.EXTRA_FACE_COMPARE, 50);
     }
 
     private void onRestoreState() {
@@ -195,7 +191,7 @@ public final class FacePreviewActivity extends AppCompatActivity implements View
     }
 
     private void beforeStartVerify() {
-        requesCameratPermissions(new PermissionCallback() {
+        requesCameraPermissions(new PermissionCallback() {
             @Override
             public void onGranted() {
                 startVerify();
@@ -208,14 +204,15 @@ public final class FacePreviewActivity extends AppCompatActivity implements View
         void onGranted();
     }
 
-    private void requesCameratPermissions(PermissionCallback callback) {
+    private void requesCameraPermissions(PermissionCallback callback) {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
             callback.onGranted();
+            return;
         }
-
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA)
                 == PackageManager.PERMISSION_GRANTED) {
             callback.onGranted();
+            return;
         }
         ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CAMERA},
                 REQUEST_CAMERA_PERMISSION);

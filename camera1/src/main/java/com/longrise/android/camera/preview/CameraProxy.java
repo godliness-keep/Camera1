@@ -28,8 +28,9 @@ final class CameraProxy {
 
     static Camera.Size calcOptimaSize(List<Camera.Size> sizes, int expectWidth, int expectHeight) {
         if (expectWidth < expectHeight) {
-            expectHeight = Math.min(expectWidth, expectHeight);
-            expectWidth = Math.max(expectWidth, expectHeight);
+            final int oldWidth = expectWidth;
+            expectWidth = expectHeight;
+            expectHeight = oldWidth;
         }
         int diffs = Integer.MAX_VALUE;
         Camera.Size bestSize = null;

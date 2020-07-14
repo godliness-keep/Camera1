@@ -206,7 +206,10 @@ public final class CameraPreview extends SurfaceView implements Handler.Callback
 
     private void beforeStartPreview() {
         try {
-            mCamera.setPreviewCallback(mConfig.mPreviewCallback);
+            final Camera.PreviewCallback previewCallback = mConfig.mPreviewCallback;
+            if (previewCallback != null) {
+                mCamera.setPreviewCallback(previewCallback);
+            }
         } catch (Exception e) {
             notifyStatusToUser(Status.CAMERA_SET_PREVIEW_FAILED, e);
         }
@@ -282,7 +285,7 @@ public final class CameraPreview extends SurfaceView implements Handler.Callback
         final int[] fpsRanges = CameraProxy.getSupportedPreviewFpsRange(basic, params().mMinFps, params().mMaxFps);
         if (fpsRanges != null) {
             basic.setPreviewFpsRange(fpsRanges[0], fpsRanges[1]);
-            printLog("optima Min: " + fpsRanges[0] + " max: " + fpsRanges[1]);
+            printLog("optima minFps: " + fpsRanges[0] + " maxFps: " + fpsRanges[1]);
         }
 
         configPreviewParameters(basic);

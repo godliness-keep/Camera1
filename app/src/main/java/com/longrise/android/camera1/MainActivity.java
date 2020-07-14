@@ -15,6 +15,8 @@ import com.longrise.android.face.verify.FaceVerifyActivity;
 import com.longrise.android.face.verify.FaceVerifyProxy;
 import com.longrise.android.face.verify.common.VerifyConsts;
 
+import java.util.Random;
+
 
 public class MainActivity extends AppCompatActivity {
 
@@ -29,7 +31,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 // 如果直接需要面部识别
-                FaceVerifyActivity.openFaceVerify(MainActivity.this, 80);
+                FaceVerifyActivity.openFaceVerify(MainActivity.this);
                 registerListener();
             }
         });
@@ -38,16 +40,12 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 // 需要先开启预览效果
-                FacePreviewActivity.openFacePreview(MainActivity.this, null, "godliness", 80);
+                FacePreviewActivity.openFacePreview(MainActivity.this, null, "godliness");
                 registerListener();
-
             }
         });
-    }
 
-    @Override
-    protected void onStart() {
-        super.onStart();
+        fastExtract();
     }
 
     @Override
@@ -85,7 +83,7 @@ public class MainActivity extends AppCompatActivity {
 
         FaceMatchRegistry.getRegistry().registerUploadListener(new FaceMatchRegistry.FaceUploadListener() {
             @Override
-            public void onUploadFacePhoto(int faceCompare, String base64, @NonNull FaceVerifyProxy.FaceUploadCallback callback) {
+            public void onUploadFacePhoto(String base64, @NonNull FaceVerifyProxy.FaceUploadCallback callback) {
                 Log.e(TAG, "onUploadFacePhoto");
 
                 // todo 在这里完成图片上传工作
@@ -94,4 +92,18 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
+    public void fastExtract() {
+        final int[] values = {9, 8, 4, 5, 6, 2, 121, 12, 24, 46, 26, 29};
+        final int[] selected = new int[5];
+        int size = values.length - 1;
+        final Random random = new Random();
+        for (int i = 0; i < 5; i++) {
+            final int currentIndex = random.nextInt(size - i);
+            final int currentValue = values[currentIndex];
+            selected[i] = currentValue;
+
+            // 将当前位置替换为后面位置
+            values[currentIndex] = values[size - i];
+        }
+    }
 }

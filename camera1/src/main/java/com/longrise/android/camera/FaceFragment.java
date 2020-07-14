@@ -163,6 +163,7 @@ public final class FaceFragment extends Fragment implements PreviewProxy, View.O
         final CameraConfig config = mPreview.openPreview();
         config.previewStatusListener(builder.mStatusCallback);
         config.takePicture(builder.mShutterCallback, builder.mRawCallback, builder.mJpegCallback);
+        config.previewCallback(builder.mPreviewCallback);
         config.params(new ParamsPackage(mParams));
     }
 

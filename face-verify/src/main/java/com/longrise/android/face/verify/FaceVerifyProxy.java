@@ -36,8 +36,8 @@ public final class FaceVerifyProxy implements Handler.Callback {
         this.mDelayRetrys = delays;
     }
 
-    void uploadFaceToService(int faceCompare, String base64) {
-        FaceMatchRegistry.getRegistry().uploadFacePhoto(faceCompare, base64, getUploadCallback());
+    void uploadFaceToService(String base64) {
+        FaceMatchRegistry.getRegistry().uploadFacePhoto(base64, getUploadCallback());
     }
 
     void destroy() {

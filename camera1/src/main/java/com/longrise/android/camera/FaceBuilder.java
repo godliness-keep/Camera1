@@ -25,6 +25,7 @@ public final class FaceBuilder {
     Camera.PictureCallback mRawCallback;
     JpegCallback mJpegCallback;
     PreviewStatusListener mStatusCallback;
+    Camera.PreviewCallback mPreviewCallback;
     boolean mTranslucentStatus;
 
     private final AppCompatActivity mHost;
@@ -48,8 +49,16 @@ public final class FaceBuilder {
     /**
      * 配置预览状态监听 {@link Status}
      */
-    public FaceBuilder previewCallback(PreviewStatusListener stateCallback) {
+    public FaceBuilder previewStatusCallback(PreviewStatusListener stateCallback) {
         this.mStatusCallback = stateCallback;
+        return this;
+    }
+
+    /**
+     * 配置相机预览数据回调
+     */
+    public FaceBuilder previewCallback(Camera.PreviewCallback previewCallback) {
+        this.mPreviewCallback = previewCallback;
         return this;
     }
 

@@ -13,11 +13,11 @@ import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 
-import com.longrise.android.camera.preview.CameraParams;
 import com.longrise.android.camera.FaceBuilder;
+import com.longrise.android.camera.PreviewProxy;
+import com.longrise.android.camera.preview.CameraParams;
 import com.longrise.android.camera.preview.JpegCallback;
 import com.longrise.android.camera.preview.ParamsCallback;
-import com.longrise.android.camera.PreviewProxy;
 import com.longrise.android.camera.preview.PreviewStatusListener;
 import com.longrise.android.camera.preview.Status;
 import com.longrise.android.face.verify.common.VerifyConsts;
@@ -30,20 +30,18 @@ import com.longrise.android.face.verify.common.VerifyConsts;
  */
 public final class FaceVerifyActivity extends AppCompatActivity {
 
+    private static final String TAG = "FaceVerifyActivity";
+
     private PreviewProxy mProxy;
     private FaceVerifyProxy mVerifyProxy;
 
-    private int mFaceCompare;
     private Runnable mDelayResult;
 
     /**
      * 开启面部识别
-     *
-     * @param faceCompare 面部识别比对值
      */
-    public static void openFaceVerify(Activity host, int faceCompare) {
+    public static void openFaceVerify(Activity host) {
         final Intent intent = new Intent(host, FaceVerifyActivity.class);
-        intent.putExtra(VerifyConsts.EXTRA_FACE_COMPARE, faceCompare);
         host.startActivityForResult(intent, VerifyConsts.REQUEST_VERIFY_CODE);
     }
 
@@ -51,16 +49,14 @@ public final class FaceVerifyActivity extends AppCompatActivity {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         beforeSetContentView();
-        if (savedInstanceState == null) {
-            getExtraData();
-        } else {
+        if (savedInstanceState != null) {
             onRestoreState();
         }
 
         // 创建面部识别Fragment
         mProxy = new FaceBuilder(this)
                 .params(mParamsCallback)
-                .previewCallback(mStatusListener)
+                .previewStatusCallback(mStatusListener)
                 .pictureCallback(null, null, mJpegCallback)
                 .translucentStatus() // 如果是沉浸式状态栏
                 .commitAndSaveState(savedInstanceState, Window.ID_ANDROID_CONTENT);
@@ -140,7 +136,7 @@ public final class FaceVerifyActivity extends AppCompatActivity {
 
             if (mVerifyProxy != null) {
                 final String faceBase64 = Base64.encodeToString(data, Base64.DEFAULT);
-                mVerifyProxy.uploadFaceToService(mFaceCompare, faceBase64);
+                mVerifyProxy.uploadFaceToService(faceBase64);
             }
         }
     };
@@ -192,7 +188,6 @@ public final class FaceVerifyActivity extends AppCompatActivity {
         finish();
     }
 
-
     private Runnable getDelayResult() {
         if (mDelayResult == null) {
             mDelayResult = new Runnable() {
@@ -211,11 +206,6 @@ public final class FaceVerifyActivity extends AppCompatActivity {
             temp.removeCallbacks(mDelayResult);
         }
         temp.postDelayed(getDelayResult(), PreviewProxy.TIP_TIME_OUT);
-    }
-
-    private void getExtraData() {
-        final Intent intent = getIntent();
-        this.mFaceCompare = intent.getIntExtra(VerifyConsts.EXTRA_FACE_COMPARE, 50);
     }
 
     private void onRestoreState() {
