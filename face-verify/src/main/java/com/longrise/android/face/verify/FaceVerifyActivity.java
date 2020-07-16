@@ -9,6 +9,7 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Base64;
+import android.util.Log;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
@@ -56,6 +57,7 @@ public final class FaceVerifyActivity extends AppCompatActivity {
                 .params(mParamsCallback)
                 .previewStatusCallback(mStatusListener)
                 .pictureCallback(null, null, mJpegCallback)
+                .faceDetectionListener(mDetectionListener)
                 .translucentStatus() // 如果是沉浸式状态栏
                 .commitAndSaveState(savedInstanceState, Window.ID_ANDROID_CONTENT);
 
@@ -162,6 +164,15 @@ public final class FaceVerifyActivity extends AppCompatActivity {
         @Override
         public void onCameraOpened(Camera.Parameters basic) {
             // 相机已经打开，可以对相机进行进一步配置
+        }
+    };
+
+    private static final String TAG = "FaceVerifyActivity";
+
+    private final Camera.FaceDetectionListener mDetectionListener = new Camera.FaceDetectionListener() {
+        @Override
+        public void onFaceDetection(Camera.Face[] faces, Camera camera) {
+            Log.e(TAG, "faces: " + faces.length);
         }
     };
 

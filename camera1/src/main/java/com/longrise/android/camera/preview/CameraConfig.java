@@ -16,6 +16,7 @@ public final class CameraConfig {
 
     PreviewStatusListener mStateListener;
     PreviewFrameCallback mPreviewCallback;
+    Camera.FaceDetectionListener mFaceDetectionListener;
 
     private ParamsCallback mParamsListener;
     private CameraParams mParams;
@@ -57,6 +58,14 @@ public final class CameraConfig {
      */
     public CameraConfig previewCallback(PreviewFrameCallback previewCallback) {
         this.mPreviewCallback = previewCallback;
+        return this;
+    }
+
+    /**
+     * 人脸数量检测
+     */
+    public CameraConfig faceDetectionListener(Camera.FaceDetectionListener detectionListener) {
+        this.mFaceDetectionListener = detectionListener;
         return this;
     }
 

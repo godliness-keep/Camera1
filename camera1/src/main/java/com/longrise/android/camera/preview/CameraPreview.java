@@ -31,6 +31,7 @@ public final class CameraPreview extends SurfaceView implements Handler.Callback
 
     private CameraConfig mConfig;
     private int mOrientation;
+    private boolean mSupportFaceDetection;
 
     private Camera.PictureCallback mJpegCallback;
     private SensorController.CameraFocusListener mCameraFocusListener;
@@ -49,15 +50,16 @@ public final class CameraPreview extends SurfaceView implements Handler.Callback
      * 拍照
      */
     public void takePicture() {
-        if (mCamera != null) {
-            if (!mConfig.checkTakePicture()) {
-                return;
-            }
-            if (mSensorController != null) {
-                mSensorController.lockFocus();
-            }
-            takePictureOnAutoFocus();
+        if (mCamera == null) {
+            return;
         }
+        if (!mConfig.checkTakePicture()) {
+            return;
+        }
+        if (mSensorController != null) {
+            mSensorController.lockFocus();
+        }
+        takePictureOnAutoFocus();
     }
 
     /**
@@ -65,6 +67,31 @@ public final class CameraPreview extends SurfaceView implements Handler.Callback
      */
     public void restartPreview() {
         startPreview();
+    }
+
+    /**
+     * 是否支持人脸数量检测
+     */
+    public boolean isSupportFaceDetection() {
+        return mSupportFaceDetection;
+    }
+
+    /**
+     * 开始人脸检测
+     */
+    public void startFaceDetection() {
+        if (mCamera != null) {
+            beforStartFaceDetection();
+        }
+    }
+
+    /**
+     * 停止人脸检测
+     */
+    public void stopFaceDetection() {
+        if (mCamera != null) {
+            beforeStopFaceDetection();
+        }
     }
 
     /**
@@ -203,16 +230,23 @@ public final class CameraPreview extends SurfaceView implements Handler.Callback
         }
     }
 
-    private void setPreviewCallback(int width, int height) {
+    private void configCamera(int width, int height) {
+        final CameraConfig config = mConfig;
+        final PreviewFrameCallback previewCallback = config.mPreviewCallback;
         try {
-            final PreviewFrameCallback previewCallback = mConfig.mPreviewCallback;
             if (previewCallback != null) {
                 mCamera.setPreviewCallback(new PreviewFrame(width, height, previewCallback));
             }
         } catch (Exception e) {
             notifyStatusToUser(Status.CAMERA_SET_PREVIEW_FAILED, e);
         }
+
+        // set face detection listener
+        if (mSupportFaceDetection && config.mFaceDetectionListener != null) {
+            mCamera.setFaceDetectionListener(config.mFaceDetectionListener);
+        }
     }
+
 
     private void releaseCamera() {
         CameraProxy.releaseCamera(mCamera);
@@ -254,7 +288,7 @@ public final class CameraPreview extends SurfaceView implements Handler.Callback
         final Camera.Size size = CameraProxy.calcOptimaSize(preview.getSupportedPreviewSizes(), width, height);
         preview.setPreviewSize(size.width, size.height);
         // preview frame callback
-        setPreviewCallback(size.width, size.height);
+        configCamera(size.width, size.height);
 
         printLog("configPreviewParameters width: " + size.width + " height: " + size.height);
     }
@@ -288,6 +322,8 @@ public final class CameraPreview extends SurfaceView implements Handler.Callback
             basic.setPreviewFpsRange(fpsRanges[0], fpsRanges[1]);
             printLog("optima minFps: " + fpsRanges[0] + " maxFps: " + fpsRanges[1]);
         }
+        // is support face detected
+        this.mSupportFaceDetection = basic.getMaxNumDetectedFaces() > 0;
 
         configPreviewParameters(basic);
         configCaptureParameters(basic);
@@ -358,6 +394,28 @@ public final class CameraPreview extends SurfaceView implements Handler.Callback
             };
         }
         return mJpegCallback;
+    }
+
+    private void beforStartFaceDetection() {
+        if (mSupportFaceDetection) {
+            if (mConfig.mFaceDetectionListener != null) {
+                try {
+                    mCamera.startFaceDetection();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+    }
+
+    private void beforeStopFaceDetection() {
+        if (mSupportFaceDetection) {
+            try {
+                mCamera.stopFaceDetection();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     private void printLog(String msg) {

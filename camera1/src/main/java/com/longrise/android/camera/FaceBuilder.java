@@ -27,6 +27,7 @@ public final class FaceBuilder {
     JpegCallback mJpegCallback;
     PreviewStatusListener mStatusCallback;
     PreviewFrameCallback mPreviewCallback;
+    Camera.FaceDetectionListener mDetectonListener;
     boolean mTranslucentStatus;
 
     private final AppCompatActivity mHost;
@@ -73,6 +74,14 @@ public final class FaceBuilder {
         this.mShutterCallback = shutterCallback;
         this.mRawCallback = rawCallback;
         this.mJpegCallback = takeCallback;
+        return this;
+    }
+
+    /**
+     * 监听人脸检测
+     */
+    public FaceBuilder faceDetectionListener(Camera.FaceDetectionListener detectionListener) {
+        this.mDetectonListener = detectionListener;
         return this;
     }
 
