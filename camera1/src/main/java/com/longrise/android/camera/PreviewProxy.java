@@ -40,4 +40,22 @@ public interface PreviewProxy {
      * 通知匹配成功
      */
     void notifyVerifySuccess(String... msg);
+
+    /**
+     * 是否支持面部检测
+     *
+     * @return support or ...
+     */
+    boolean isSupportFaceDetection();
+
+    /**
+     * 开始人脸检测
+     */
+    void startFaceDetection();
+
+    /**
+     * 停止人脸检测
+     */
+    void stopFaceDetection();
 }
+
