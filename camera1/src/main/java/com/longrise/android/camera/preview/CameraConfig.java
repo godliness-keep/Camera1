@@ -1,8 +1,7 @@
 package com.longrise.android.camera.preview;
 
 import android.hardware.Camera;
-
-import com.longrise.android.camera.CameraParams;
+import android.support.annotation.NonNull;
 
 /**
  * Created by godliness on 2020-07-01.
@@ -16,8 +15,10 @@ public final class CameraConfig {
     JpegCallback mJpegCallback;
 
     PreviewStatusListener mStateListener;
-    ParamsCallback mParamsListener;
+    PreviewFrameCallback mPreviewCallback;
+    Camera.FaceDetectionListener mFaceDetectionListener;
 
+    private ParamsCallback mParamsListener;
     private CameraParams mParams;
 
     CameraConfig() {
@@ -52,20 +53,25 @@ public final class CameraConfig {
         return this;
     }
 
-    int cameraId() {
-        return cameraParams().mCameraId;
+    /**
+     * 预览回调
+     */
+    public CameraConfig previewCallback(PreviewFrameCallback previewCallback) {
+        this.mPreviewCallback = previewCallback;
+        return this;
     }
 
-    int pictureWidth() {
-        return cameraParams().mPictureWidth;
+    /**
+     * 人脸数量检测
+     */
+    public CameraConfig faceDetectionListener(Camera.FaceDetectionListener detectionListener) {
+        this.mFaceDetectionListener = detectionListener;
+        return this;
     }
 
-    int pictureHeight() {
-        return cameraParams().mPictureHeight;
-    }
-
-    int imageQuality() {
-        return cameraParams().mImageQuality;
+    @NonNull
+    CameraParams params() {
+        return cameraParams();
     }
 
     boolean checkTakePicture() {

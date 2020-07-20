@@ -12,9 +12,9 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.longrise.android.camera.preview.CameraConfig;
+import com.longrise.android.camera.preview.CameraParams;
 import com.longrise.android.camera.preview.CameraPreview;
 import com.longrise.android.camera.preview.ParamsCallback;
-import com.longrise.android.camera.preview.PreviewProxy;
 import com.longrise.android.camera.utils.DpUtil;
 import com.longrise.android.camera.widget.WheelView;
 
@@ -163,6 +163,8 @@ public final class FaceFragment extends Fragment implements PreviewProxy, View.O
         final CameraConfig config = mPreview.openPreview();
         config.previewStatusListener(builder.mStatusCallback);
         config.takePicture(builder.mShutterCallback, builder.mRawCallback, builder.mJpegCallback);
+        config.previewCallback(builder.mPreviewCallback);
+        config.faceDetectionListener(builder.mDetectonListener);
         config.params(new ParamsPackage(mParams));
     }
 

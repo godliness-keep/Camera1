@@ -1,4 +1,4 @@
-package com.longrise.android.camera;
+package com.longrise.android.camera.preview;
 
 import android.hardware.Camera;
 import android.os.Parcel;
@@ -13,25 +13,50 @@ public final class CameraParams implements Parcelable {
 
     public static final String EXTRA_PREVIEW_PARAMS = "extra_preview_params";
 
-    /**
-     * 打开的相机ID
-     */
-    public int mCameraId = Camera.CameraInfo.CAMERA_FACING_BACK;
+    int mCameraId = Camera.CameraInfo.CAMERA_FACING_BACK;
+    int mPictureWidth = 640;
+    int mPictureHeight = 480;
+    int mImageQuality = 100;
+    int mMinFps;
+    int mMaxFps;
+    String mFocusMode = Camera.Parameters.FOCUS_MODE_AUTO;
 
     /**
-     * 图片宽度
+     * 相机ID
      */
-    public int mPictureWidth = 640;
+    public void cameraId(int cameraId) {
+        this.mCameraId = cameraId;
+    }
 
     /**
-     * 图片高度
+     * 拍照图片尺寸
      */
-    public int mPictureHeight = 480;
+    public void pictureSize(int width, int height) {
+        this.mPictureWidth = width;
+        this.mPictureHeight = height;
+    }
 
     /**
-     * 图片的质量
+     * 拍照图片质量
      */
-    public int mImageQuality = 100;
+    public void imageQuality(int imageQuality) {
+        this.mImageQuality = imageQuality;
+    }
+
+    /**
+     * 预览帧率，建议最小值不低于24fps，即24000
+     */
+    public void fpsRange(int min, int max) {
+        this.mMinFps = min;
+        this.mMaxFps = max;
+    }
+
+    /**
+     * 对焦模式
+     */
+    public void focusMode(String focusMode) {
+        this.mFocusMode = focusMode;
+    }
 
     public CameraParams() {
 
@@ -42,6 +67,9 @@ public final class CameraParams implements Parcelable {
         mPictureWidth = in.readInt();
         mPictureHeight = in.readInt();
         mImageQuality = in.readInt();
+        mMinFps = in.readInt();
+        mMaxFps = in.readInt();
+        mFocusMode = in.readString();
     }
 
     @Override
@@ -50,6 +78,9 @@ public final class CameraParams implements Parcelable {
         dest.writeInt(mPictureWidth);
         dest.writeInt(mPictureHeight);
         dest.writeInt(mImageQuality);
+        dest.writeInt(mMinFps);
+        dest.writeInt(mMaxFps);
+        dest.writeString(mFocusMode);
     }
 
     @Override
@@ -68,4 +99,5 @@ public final class CameraParams implements Parcelable {
             return new CameraParams[size];
         }
     };
+
 }

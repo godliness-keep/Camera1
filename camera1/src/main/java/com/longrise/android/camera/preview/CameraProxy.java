@@ -1,6 +1,9 @@
 package com.longrise.android.camera.preview;
 
 import android.app.Activity;
+import android.app.admin.DevicePolicyManager;
+import android.content.Context;
+import android.graphics.ImageFormat;
 import android.hardware.Camera;
 import android.media.ExifInterface;
 import android.support.annotation.Nullable;
@@ -14,14 +17,16 @@ import java.util.List;
  *
  * @author godliness
  */
-public final class CameraProxy {
+@SuppressWarnings("unused")
+final class CameraProxy {
 
-    @Nullable
-    public static Camera createCamera(int cameraId) throws RuntimeException {
+    private static final String TAG = "CameraProxy";
+
+    static Camera createCamera(int cameraId) throws RuntimeException {
         return Camera.open(cameraId);
     }
 
-    public static Camera.Size calcOptimaSize(List<Camera.Size> sizes, int expectWidth, int expectHeight) {
+    static Camera.Size calcOptimaSize(List<Camera.Size> sizes, int expectWidth, int expectHeight) {
         if (expectWidth < expectHeight) {
             final int oldWidth = expectWidth;
             expectWidth = expectHeight;
@@ -44,8 +49,59 @@ public final class CameraProxy {
         return bestSize;
     }
 
-    public static int getDisplayOrientation(Activity host,
-                                            int cameraId) {
+    static int getSupportPreviewFormat(Camera.Parameters parameters) {
+        final List<Integer> previewFormats = parameters.getSupportedPreviewFormats();
+        int nv21 = ImageFormat.UNKNOWN;
+        int yv12 = ImageFormat.UNKNOWN;
+        for (Integer format : previewFormats) {
+            if (format == ImageFormat.NV21) {
+                nv21 = ImageFormat.NV21;
+            } else if (format == ImageFormat.YV12) {
+                yv12 = ImageFormat.YV12;
+            }
+        }
+        return nv21 != ImageFormat.UNKNOWN ? nv21 : yv12;
+    }
+
+    static String getSupportFocusMode(Camera.Parameters parameters, String expectMode) {
+        final List<String> supportedFocusModes = parameters.getSupportedFocusModes();
+        if (supportedFocusModes.contains(expectMode)) {
+            return expectMode;
+        }
+        if (supportedFocusModes.contains(Camera.Parameters.FOCUS_MODE_AUTO)) {
+            return Camera.Parameters.FOCUS_MODE_AUTO;
+        }
+        return supportedFocusModes.get(0);
+    }
+
+    @Nullable
+    static int[] getSupportedPreviewFpsRange(Camera.Parameters parameters, int min, int max) {
+        if (min <= 0 || max <= 0) {
+            return null;
+        }
+        return calcPreviewFpsRange(parameters, min, max);
+    }
+
+    static int[] calcPreviewFpsRange(Camera.Parameters parameters, int min, int max) {
+        final List<int[]> fpsRanges = parameters.getSupportedPreviewFpsRange();
+        int diffs = Integer.MAX_VALUE;
+        int[] bestFpsRange = null;
+        for (int[] fpsRange : fpsRanges) {
+            final int diffMin = Math.abs(fpsRange[0] - min);
+            final int diffMax = Math.abs(fpsRange[1] - max);
+            final int newDiff = diffMin + diffMax;
+            if (newDiff == 0) {
+                bestFpsRange = fpsRange;
+                break;
+            } else if (diffs > newDiff) {
+                diffs = newDiff;
+                bestFpsRange = fpsRange;
+            }
+        }
+        return bestFpsRange;
+    }
+
+    static int getDisplayOrientation(Activity host, int cameraId) {
         if (host == null) {
             return 0;
         }
@@ -54,12 +110,17 @@ public final class CameraProxy {
             Camera.getCameraInfo(cameraId, info);
         } catch (Exception e) {
             e.printStackTrace();
+            return 0;
         }
+        return calcDisplayOrientation(info, host
+                .getWindowManager()
+                .getDefaultDisplay()
+                .getRotation());
+    }
 
-        final int rotation = host.getWindowManager().getDefaultDisplay()
-                .getRotation();
+    static int calcDisplayOrientation(Camera.CameraInfo info, int displayRotation) {
         int degrees = 0;
-        switch (rotation) {
+        switch (displayRotation) {
             case Surface.ROTATION_0:
                 degrees = 0;
                 break;
@@ -85,7 +146,7 @@ public final class CameraProxy {
         return result;
     }
 
-    public static void releaseCamera(Camera camera) {
+    static void releaseCamera(Camera camera) {
         if (camera != null) {
             camera.stopPreview();
             camera.setPreviewCallback(null);
@@ -93,7 +154,7 @@ public final class CameraProxy {
         }
     }
 
-    public static int getBitmapDegreeFromFile(String path) {
+    static int getBitmapDegreeFromFile(String path) {
         int degree = 0;
         ExifInterface exifInterface = null;
         try {
@@ -120,5 +181,10 @@ public final class CameraProxy {
             }
         }
         return degree;
+    }
+
+    static boolean checkCameraService(Context context) {
+        final DevicePolicyManager dpm = (DevicePolicyManager) context.getSystemService(Context.DEVICE_POLICY_SERVICE);
+        return !dpm.getCameraDisabled(null);
     }
 }

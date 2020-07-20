@@ -22,7 +22,7 @@ public final class FaceMatchRegistry {
         /**
          * 完善照片上传
          */
-        void onUploadFacePhoto(int faceCompare, String base64, @NonNull FaceVerifyProxy.FaceUploadCallback callback);
+        void onUploadFacePhoto(String base64, @NonNull FaceVerifyProxy.FaceUploadCallback callback);
     }
 
     public interface FaceMatchListener {
@@ -30,7 +30,7 @@ public final class FaceMatchRegistry {
         /**
          * 完善匹配结果查询
          */
-        void onMatchResult(final String id, final FaceVerifyProxy.FaceMatchCallback callback);
+        void onMatchResult(final String id, @NonNull FaceVerifyProxy.FaceMatchCallback callback);
     }
 
     public static FaceMatchRegistry getRegistry() {
@@ -62,15 +62,15 @@ public final class FaceMatchRegistry {
         this.mMatchListener = matchListener;
     }
 
-    void queryFaceMatchResult(final String id, final FaceVerifyProxy.FaceMatchCallback callback) {
+    void queryFaceMatchResult(final String id, @NonNull FaceVerifyProxy.FaceMatchCallback callback) {
         if (mMatchListener != null) {
             mMatchListener.onMatchResult(id, callback);
         }
     }
 
-    void uploadFacePhoto(final int faceCompare, String base64, @NonNull FaceVerifyProxy.FaceUploadCallback callback) {
+    void uploadFacePhoto(String base64, @NonNull FaceVerifyProxy.FaceUploadCallback callback) {
         if (mUpladListener != null) {
-            mUpladListener.onUploadFacePhoto(faceCompare, base64, callback);
+            mUpladListener.onUploadFacePhoto(base64, callback);
         }
     }
 }

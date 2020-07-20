@@ -7,10 +7,11 @@ import android.support.annotation.IdRes;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
 
+import com.longrise.android.camera.preview.CameraParams;
 import com.longrise.android.camera.preview.JpegCallback;
+import com.longrise.android.camera.preview.PreviewFrameCallback;
 import com.longrise.android.camera.preview.Status;
 import com.longrise.android.camera.preview.ParamsCallback;
-import com.longrise.android.camera.preview.PreviewProxy;
 import com.longrise.android.camera.preview.PreviewStatusListener;
 
 
@@ -25,6 +26,8 @@ public final class FaceBuilder {
     Camera.PictureCallback mRawCallback;
     JpegCallback mJpegCallback;
     PreviewStatusListener mStatusCallback;
+    PreviewFrameCallback mPreviewCallback;
+    Camera.FaceDetectionListener mDetectonListener;
     boolean mTranslucentStatus;
 
     private final AppCompatActivity mHost;
@@ -48,8 +51,16 @@ public final class FaceBuilder {
     /**
      * 配置预览状态监听 {@link Status}
      */
-    public FaceBuilder previewCallback(PreviewStatusListener stateCallback) {
+    public FaceBuilder previewStatusCallback(PreviewStatusListener stateCallback) {
         this.mStatusCallback = stateCallback;
+        return this;
+    }
+
+    /**
+     * 配置相机预览数据回调
+     */
+    public FaceBuilder previewCallback(PreviewFrameCallback previewCallback) {
+        this.mPreviewCallback = previewCallback;
         return this;
     }
 
@@ -63,6 +74,14 @@ public final class FaceBuilder {
         this.mShutterCallback = shutterCallback;
         this.mRawCallback = rawCallback;
         this.mJpegCallback = takeCallback;
+        return this;
+    }
+
+    /**
+     * 监听人脸检测
+     */
+    public FaceBuilder faceDetectionListener(Camera.FaceDetectionListener detectionListener) {
+        this.mDetectonListener = detectionListener;
         return this;
     }
 

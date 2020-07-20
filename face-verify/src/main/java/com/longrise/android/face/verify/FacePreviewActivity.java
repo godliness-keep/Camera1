@@ -43,19 +43,16 @@ public final class FacePreviewActivity extends AppCompatActivity implements View
 
     private String mName;
     private String mPreviewPath;
-    private int mFaceCompare;
 
     /**
      * 开启面部预览
      *
      * @param previewPath 预览的图片地址
      * @param name        名字
-     * @param faceCompare 比对率
      */
-    public static void openFacePreview(Activity host, String previewPath, String name, int faceCompare) {
+    public static void openFacePreview(Activity host, String previewPath, String name) {
         final Intent intent = new Intent(host, FacePreviewActivity.class);
         intent.putExtra(VerifyConsts.EXTRA_PREVIEW_PATH, previewPath);
-        intent.putExtra(VerifyConsts.EXTRA_FACE_COMPARE, faceCompare);
         intent.putExtra(VerifyConsts.EXTRA_PREVIEW_NAME, name);
         host.startActivityForResult(intent, VerifyConsts.REQUEST_VERIFY_CODE);
     }
@@ -87,13 +84,15 @@ public final class FacePreviewActivity extends AppCompatActivity implements View
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         if (requestCode == REQUEST_CAMERA_PERMISSION) {
             if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                // 权限被授予
                 startVerify();
             } else {
                 if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.CAMERA)) {
-                    // 如果用户拒绝过
+                    // 需要给用户进一步解释为什么要使用该权限
                     showRequestPermissionRationale();
                 } else {
-                    // 如果用户勾选不在提示
+                    // 此时可以肯定用户已经勾选了不再提示
+                    // 提示用户如果想再次申请，只能去系统设置中开启
                     showSystemSetting();
                 }
             }
@@ -104,9 +103,7 @@ public final class FacePreviewActivity extends AppCompatActivity implements View
     public void onClick(View v) {
         final int id = v.getId();
         if (id == R.id.tv_start_verify) {
-            if (beforStartVerify()) {
-                startVerify();
-            }
+            beforeStartVerify();
         } else if (id == R.id.iv_back_face_preview) {
             finish();
         }
@@ -140,7 +137,7 @@ public final class FacePreviewActivity extends AppCompatActivity implements View
     }
 
     private void startVerify() {
-        FaceVerifyActivity.openFaceVerify(this, mFaceCompare);
+        FaceVerifyActivity.openFaceVerify(this);
     }
 
     private void bindData() {
@@ -168,7 +165,6 @@ public final class FacePreviewActivity extends AppCompatActivity implements View
         final Intent intent = getIntent();
         this.mPreviewPath = intent.getStringExtra(VerifyConsts.EXTRA_PREVIEW_PATH);
         this.mName = intent.getStringExtra(VerifyConsts.EXTRA_PREVIEW_NAME);
-        this.mFaceCompare = intent.getIntExtra(VerifyConsts.EXTRA_FACE_COMPARE, 50);
     }
 
     private void onRestoreState() {
@@ -194,14 +190,31 @@ public final class FacePreviewActivity extends AppCompatActivity implements View
                 }).show();
     }
 
-    private boolean beforStartVerify() {
+    private void beforeStartVerify() {
+        requesCameraPermissions(new PermissionCallback() {
+            @Override
+            public void onGranted() {
+                startVerify();
+            }
+        });
+    }
+
+    public interface PermissionCallback {
+
+        void onGranted();
+    }
+
+    private void requesCameraPermissions(PermissionCallback callback) {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
-            return true;
+            callback.onGranted();
+            return;
         }
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED) {
-            return true;
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA)
+                == PackageManager.PERMISSION_GRANTED) {
+            callback.onGranted();
+            return;
         }
-        ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CAMERA}, REQUEST_CAMERA_PERMISSION);
-        return false;
+        ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CAMERA},
+                REQUEST_CAMERA_PERMISSION);
     }
 }

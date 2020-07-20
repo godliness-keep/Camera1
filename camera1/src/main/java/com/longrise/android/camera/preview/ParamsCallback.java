@@ -1,7 +1,5 @@
 package com.longrise.android.camera.preview;
 
-import com.longrise.android.camera.CameraParams;
-
 /**
  * Created by godliness on 2020-07-02.
  *

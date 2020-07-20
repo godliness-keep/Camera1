@@ -5,7 +5,6 @@ import android.content.Context;
 import android.graphics.ImageFormat;
 import android.hardware.Camera;
 import android.os.Handler;
-import android.os.HandlerThread;
 import android.os.Message;
 import android.support.annotation.Nullable;
 import android.util.AttributeSet;
@@ -15,8 +14,6 @@ import android.view.SurfaceView;
 
 import com.longrise.android.camera.BuildConfig;
 import com.longrise.android.camera.focus.SensorController;
-
-import java.util.List;
 
 /**
  * Created by godliness on 2020-07-01.
@@ -34,8 +31,8 @@ public final class CameraPreview extends SurfaceView implements Handler.Callback
 
     private CameraConfig mConfig;
     private int mOrientation;
+    private boolean mSupportFaceDetection;
 
-    private Camera.AutoFocusCallback mAutoFocusCallback;
     private Camera.PictureCallback mJpegCallback;
     private SensorController.CameraFocusListener mCameraFocusListener;
 
@@ -53,15 +50,16 @@ public final class CameraPreview extends SurfaceView implements Handler.Callback
      * 拍照
      */
     public void takePicture() {
-        if (mCamera != null) {
-            if (!mConfig.checkTakePicture()) {
-                return;
-            }
-            if (mSensorController != null) {
-                mSensorController.lockFocus();
-            }
-            takePictureOnAutoFocus();
+        if (mCamera == null) {
+            return;
         }
+        if (!mConfig.checkTakePicture()) {
+            return;
+        }
+        if (mSensorController != null) {
+            mSensorController.lockFocus();
+        }
+        takePictureOnAutoFocus();
     }
 
     /**
@@ -69,6 +67,31 @@ public final class CameraPreview extends SurfaceView implements Handler.Callback
      */
     public void restartPreview() {
         startPreview();
+    }
+
+    /**
+     * 是否支持人脸数量检测
+     */
+    public boolean isSupportFaceDetection() {
+        return mSupportFaceDetection;
+    }
+
+    /**
+     * 开始人脸检测
+     */
+    public void startFaceDetection() {
+        if (mCamera != null) {
+            beforStartFaceDetection();
+        }
+    }
+
+    /**
+     * 停止人脸检测
+     */
+    public void stopFaceDetection() {
+        if (mCamera != null) {
+            beforeStopFaceDetection();
+        }
     }
 
     /**
@@ -162,7 +185,7 @@ public final class CameraPreview extends SurfaceView implements Handler.Callback
     private void createIfCamera() {
         if (mCamera == null) {
             try {
-                mCamera = CameraProxy.createCamera(mConfig.cameraId());
+                mCamera = CameraProxy.createCamera(params().mCameraId);
             } catch (RuntimeException e) {
                 notifyStatusToUser(Status.CAMERA_OPEN_FAILED, e);
             }
@@ -202,11 +225,28 @@ public final class CameraPreview extends SurfaceView implements Handler.Callback
             } catch (Exception e) {
                 notifyStatusToUser(Status.CAMERA_PREVIEW_FAILED, e);
             }
-
             // 首次打开时对焦
-            setAutoFocus(null);
+            setAutoFocus();
         }
     }
+
+    private void configCamera(int width, int height) {
+        final CameraConfig config = mConfig;
+        final PreviewFrameCallback previewCallback = config.mPreviewCallback;
+        try {
+            if (previewCallback != null) {
+                mCamera.setPreviewCallback(new PreviewFrame(width, height, previewCallback));
+            }
+        } catch (Exception e) {
+            notifyStatusToUser(Status.CAMERA_SET_PREVIEW_FAILED, e);
+        }
+
+        // set face detection listener
+        if (mSupportFaceDetection && config.mFaceDetectionListener != null) {
+            mCamera.setFaceDetectionListener(config.mFaceDetectionListener);
+        }
+    }
+
 
     private void releaseCamera() {
         CameraProxy.releaseCamera(mCamera);
@@ -247,20 +287,22 @@ public final class CameraPreview extends SurfaceView implements Handler.Callback
         final int height = getHeight();
         final Camera.Size size = CameraProxy.calcOptimaSize(preview.getSupportedPreviewSizes(), width, height);
         preview.setPreviewSize(size.width, size.height);
+        // preview frame callback
+        configCamera(size.width, size.height);
 
         printLog("configPreviewParameters width: " + size.width + " height: " + size.height);
     }
 
     private void configCaptureParameters(Camera.Parameters capture) {
-        final CameraConfig config = this.mConfig;
-        final int expectWidth = config.pictureWidth();
-        final int expectHeight = config.pictureHeight();
+        final int expectWidth = params().mPictureWidth;
+        final int expectHeight = params().mPictureHeight;
         final Camera.Size optimaSize = CameraProxy.calcOptimaSize(capture.getSupportedPictureSizes(), expectWidth, expectHeight);
         capture.setPictureSize(optimaSize.width, optimaSize.height);
-        this.mOrientation = CameraProxy.getDisplayOrientation((Activity) getContext(), config.cameraId());
-        capture.set("rotation", mOrientation);
+        this.mOrientation = CameraProxy.getDisplayOrientation((Activity) getContext(), params().mCameraId);
+        capture.setRotation(mOrientation);
 
         printLog("configCaptureParameters: width: " + optimaSize.width + " height: " + optimaSize.height);
+        printLog("rotation: " + mOrientation);
     }
 
     private Camera.Parameters configBasicParamseters() {
@@ -269,34 +311,44 @@ public final class CameraPreview extends SurfaceView implements Handler.Callback
         if (config.mStateListener != null) {
             config.mStateListener.onCameraOpened(basic);
         }
-        basic.setPreviewFormat(ImageFormat.NV21);
+
+        basic.setPreviewFormat(CameraProxy.getSupportPreviewFormat(basic));
         basic.setPictureFormat(ImageFormat.JPEG);
-        basic.setJpegQuality(config.imageQuality());
-        final List<String> supportedFocusModes = basic.getSupportedFocusModes();
-        if (supportedFocusModes != null && supportedFocusModes.contains(Camera.Parameters.FOCUS_MODE_AUTO)) {
-            basic.setFocusMode(Camera.Parameters.FOCUS_MODE_AUTO);
+        basic.setJpegQuality(params().mImageQuality);
+        basic.setFocusMode(CameraProxy.getSupportFocusMode(basic, params().mFocusMode));
+        // set preview fps range[min,max]
+        final int[] fpsRanges = CameraProxy.getSupportedPreviewFpsRange(basic, params().mMinFps, params().mMaxFps);
+        if (fpsRanges != null) {
+            basic.setPreviewFpsRange(fpsRanges[0], fpsRanges[1]);
+            printLog("optima minFps: " + fpsRanges[0] + " maxFps: " + fpsRanges[1]);
         }
+        // is support face detected
+        this.mSupportFaceDetection = basic.getMaxNumDetectedFaces() > 0;
 
         configPreviewParameters(basic);
         configCaptureParameters(basic);
         return basic;
     }
 
-    private void setAutoFocus(Camera.AutoFocusCallback focus) {
+    private void setAutoFocus() {
         if (mCamera != null) {
             try {
-                mCamera.autoFocus(focus);
+                mCamera.autoFocus(null);
             } catch (Exception e) {
                 notifyStatusToUser(Status.MSG_AUTO_FOCUS_FAILED, e);
             }
         }
     }
 
+    private CameraParams params() {
+        return mConfig.params();
+    }
+
     /**
      * 根据配置决定是否要创建自动对焦控制器
      */
     private void createSensorControllerFromConfig() {
-        if (mConfig.cameraId() == Camera.CameraInfo.CAMERA_FACING_BACK) {
+        if (params().mCameraId == Camera.CameraInfo.CAMERA_FACING_BACK) {
             if (mSensorController == null) {
                 mSensorController = new SensorController(getContext());
                 mSensorController.setCameraFocusListener(getCameraFocusListener());
@@ -318,7 +370,7 @@ public final class CameraPreview extends SurfaceView implements Handler.Callback
             mCameraFocusListener = new SensorController.CameraFocusListener() {
                 @Override
                 public void onFocus() {
-                    setAutoFocus(null);
+                    setAutoFocus();
                     printLog("onFocus");
                 }
             };
@@ -344,20 +396,26 @@ public final class CameraPreview extends SurfaceView implements Handler.Callback
         return mJpegCallback;
     }
 
-    private Camera.AutoFocusCallback getAutoFocusCallback() {
-        if (mAutoFocusCallback == null) {
-            mAutoFocusCallback = new Camera.AutoFocusCallback() {
-                @Override
-                public void onAutoFocus(boolean success, Camera camera) {
-                    if (success) {
-                        takePictureOnAutoFocus();
-                    } else {
-                        notifyStatusToUser(Status.MSG_AUTO_FOCUS_FAILED, "Take picture auto focus failed");
-                    }
+    private void beforStartFaceDetection() {
+        if (mSupportFaceDetection) {
+            if (mConfig.mFaceDetectionListener != null) {
+                try {
+                    mCamera.startFaceDetection();
+                } catch (Exception e) {
+                    e.printStackTrace();
                 }
-            };
+            }
         }
-        return mAutoFocusCallback;
+    }
+
+    private void beforeStopFaceDetection() {
+        if (mSupportFaceDetection) {
+            try {
+                mCamera.stopFaceDetection();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     private void printLog(String msg) {
