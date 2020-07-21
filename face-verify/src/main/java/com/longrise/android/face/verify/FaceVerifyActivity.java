@@ -147,6 +147,9 @@ public final class FaceVerifyActivity extends AppCompatActivity {
         }
     };
 
+    /**
+     * 业务拦截
+     */
     private final TakeInterceptListener mInterceptListener = new TakeInterceptListener() {
 
         @Override
@@ -163,6 +166,9 @@ public final class FaceVerifyActivity extends AppCompatActivity {
         }
     };
 
+    /**
+     * 人脸检测
+     */
     private final Camera.FaceDetectionListener mFaceDetectionListener = new Camera.FaceDetectionListener() {
         @Override
         public void onFaceDetection(Camera.Face[] faces, Camera camera) {
