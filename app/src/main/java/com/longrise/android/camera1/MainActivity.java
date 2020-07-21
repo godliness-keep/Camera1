@@ -9,8 +9,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 
-import com.longrise.android.camera.preview.CameraConfig;
-import com.longrise.android.camera.preview.CameraPreview;
 import com.longrise.android.face.verify.FaceMatchRegistry;
 import com.longrise.android.face.verify.FacePreviewActivity;
 import com.longrise.android.face.verify.FaceVerifyActivity;
@@ -23,6 +21,8 @@ import java.util.Random;
 public class MainActivity extends AppCompatActivity {
 
     private static final String TAG = "MainActivity";
+
+    private static final String PREVIEW_PATH = "https://wuhan.yxybb.com/BBV6/LEAP/Download/headimage/2019/10/28/92039a946f094544abd5eec115c2e678.jpg";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,7 +42,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 // 需要先开启预览效果
-                FacePreviewActivity.openFacePreview(MainActivity.this, null, "godliness");
+                FacePreviewActivity.openFacePreview(MainActivity.this, PREVIEW_PATH, "godliness");
                 registerListener();
             }
         });

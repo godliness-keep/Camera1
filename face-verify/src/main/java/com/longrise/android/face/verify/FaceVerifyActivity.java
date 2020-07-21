@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Color;
 import android.hardware.Camera;
+import android.media.FaceDetector;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -124,7 +125,7 @@ public final class FaceVerifyActivity extends AppCompatActivity {
         @Override
         public CameraParams params() {
             final CameraParams params = new CameraParams();
-            params.cameraId(Camera.CameraInfo.CAMERA_FACING_BACK);
+            params.cameraId(Camera.CameraInfo.CAMERA_FACING_FRONT);
             return params;
         }
     };
