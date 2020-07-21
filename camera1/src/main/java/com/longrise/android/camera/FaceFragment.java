@@ -139,7 +139,10 @@ public final class FaceFragment extends Fragment implements PreviewProxy, View.O
     @Override
     public void onClick(View v) {
         if (v.getId() == R.id.tv_take_picture) {
-            takePicture();
+            final TakeInterceptListener intercept = mBuilder.mInterceptListener;
+            if (intercept == null || !intercept.interceptTakePicture()) {
+                takePicture();
+            }
         }
     }
 

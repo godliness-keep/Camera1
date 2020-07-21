@@ -17,6 +17,7 @@ import android.view.WindowManager;
 
 import com.longrise.android.camera.FaceBuilder;
 import com.longrise.android.camera.PreviewProxy;
+import com.longrise.android.camera.TakeInterceptListener;
 import com.longrise.android.camera.preview.CameraParams;
 import com.longrise.android.camera.preview.JpegCallback;
 import com.longrise.android.camera.preview.ParamsCallback;
@@ -58,6 +59,7 @@ public final class FaceVerifyActivity extends AppCompatActivity {
                 .params(mParamsCallback)
                 .previewStatusCallback(mStatusListener)
                 .pictureCallback(null, null, mJpegCallback)
+                .takeInterceptListener(mInterceptListener)
                 .translucentStatus()
                 .commitAndSaveState(savedInstanceState, Window.ID_ANDROID_CONTENT);
 
@@ -146,6 +148,15 @@ public final class FaceVerifyActivity extends AppCompatActivity {
                 BitmapFactory.decodeByteArray(data, 0, data.length, options);
                 Log.e("FaceVerifyActivity", "take picture width: " + options.outWidth + " height: " + options.outHeight);
             }
+        }
+    };
+
+    private final TakeInterceptListener mInterceptListener = new TakeInterceptListener() {
+
+        @Override
+        public boolean interceptTakePicture() {
+            // todo 是否拦截拍照
+            return false;
         }
     };
 
