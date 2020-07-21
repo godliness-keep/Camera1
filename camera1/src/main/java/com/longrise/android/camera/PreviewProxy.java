@@ -47,15 +47,5 @@ public interface PreviewProxy {
      * @return support or ...
      */
     boolean isSupportFaceDetection();
-
-    /**
-     * 开始人脸检测
-     */
-    void startFaceDetection();
-
-    /**
-     * 停止人脸检测
-     */
-    void stopFaceDetection();
 }
 

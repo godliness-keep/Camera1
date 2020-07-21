@@ -37,6 +37,15 @@ public final class FaceVerifyActivity extends AppCompatActivity {
     private Runnable mDelayResult;
 
     /**
+     * 是否支持面部检测
+     */
+    private boolean mSupportFaceDetection;
+    /**
+     * 当前检测到面部数量
+     */
+    private int mFaceNum;
+
+    /**
      * 开启面部识别
      */
     public static void openFaceVerify(Activity host) {
@@ -60,6 +69,8 @@ public final class FaceVerifyActivity extends AppCompatActivity {
                 .faceDetectionListener(mDetectionListener)
                 .translucentStatus() // 如果是沉浸式状态栏
                 .commitAndSaveState(savedInstanceState, Window.ID_ANDROID_CONTENT);
+
+        mSupportFaceDetection = mProxy.isSupportFaceDetection();
 
         // 创建识别代理，监听上传服务与匹配过程
         createVerifyProxy();
@@ -167,12 +178,16 @@ public final class FaceVerifyActivity extends AppCompatActivity {
         }
     };
 
-    private static final String TAG = "FaceVerifyActivity";
-
     private final Camera.FaceDetectionListener mDetectionListener = new Camera.FaceDetectionListener() {
         @Override
         public void onFaceDetection(Camera.Face[] faces, Camera camera) {
-            Log.e(TAG, "faces: " + faces.length);
+            // 这里处理面部检测
+            mFaceNum = faces != null ? faces.length : 0;
+            // 0  一般来说没有面部，植物花草动物应该都是0的
+            // 1 可以认为是有一个面部存在
+            // 大于 1 一般认为存在多张面部
+
+            Log.e("Camera", "mFaceNum: " + mFaceNum);
         }
     };
 
