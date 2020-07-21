@@ -2,6 +2,7 @@ package com.longrise.android.face.verify;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.hardware.Camera;
 import android.os.Build;
@@ -16,6 +17,7 @@ import android.view.WindowManager;
 
 import com.longrise.android.camera.FaceBuilder;
 import com.longrise.android.camera.PreviewProxy;
+import com.longrise.android.camera.TakeInterceptListener;
 import com.longrise.android.camera.preview.CameraParams;
 import com.longrise.android.camera.preview.JpegCallback;
 import com.longrise.android.camera.preview.ParamsCallback;
@@ -35,15 +37,6 @@ public final class FaceVerifyActivity extends AppCompatActivity {
     private FaceVerifyProxy mVerifyProxy;
 
     private Runnable mDelayResult;
-
-    /**
-     * 是否支持面部检测
-     */
-    private boolean mSupportFaceDetection;
-    /**
-     * 当前检测到面部数量
-     */
-    private int mFaceNum;
 
     /**
      * 开启面部识别
@@ -66,11 +59,9 @@ public final class FaceVerifyActivity extends AppCompatActivity {
                 .params(mParamsCallback)
                 .previewStatusCallback(mStatusListener)
                 .pictureCallback(null, null, mJpegCallback)
-                .faceDetectionListener(mDetectionListener)
-                .translucentStatus() // 如果是沉浸式状态栏
+                .takeInterceptListener(mInterceptListener)
+                .translucentStatus()
                 .commitAndSaveState(savedInstanceState, Window.ID_ANDROID_CONTENT);
-
-        mSupportFaceDetection = mProxy.isSupportFaceDetection();
 
         // 创建识别代理，监听上传服务与匹配过程
         createVerifyProxy();
@@ -149,6 +140,23 @@ public final class FaceVerifyActivity extends AppCompatActivity {
                 final String faceBase64 = Base64.encodeToString(data, Base64.DEFAULT);
                 mVerifyProxy.uploadFaceToService(faceBase64);
             }
+
+
+            if (BuildConfig.DEBUG) {
+                final BitmapFactory.Options options = new BitmapFactory.Options();
+                options.inJustDecodeBounds = true;
+                BitmapFactory.decodeByteArray(data, 0, data.length, options);
+                Log.e("FaceVerifyActivity", "take picture width: " + options.outWidth + " height: " + options.outHeight);
+            }
+        }
+    };
+
+    private final TakeInterceptListener mInterceptListener = new TakeInterceptListener() {
+
+        @Override
+        public boolean interceptTakePicture() {
+            // todo 是否拦截拍照
+            return false;
         }
     };
 
@@ -175,19 +183,6 @@ public final class FaceVerifyActivity extends AppCompatActivity {
         @Override
         public void onCameraOpened(Camera.Parameters basic) {
             // 相机已经打开，可以对相机进行进一步配置
-        }
-    };
-
-    private final Camera.FaceDetectionListener mDetectionListener = new Camera.FaceDetectionListener() {
-        @Override
-        public void onFaceDetection(Camera.Face[] faces, Camera camera) {
-            // 这里处理面部检测
-            mFaceNum = faces != null ? faces.length : 0;
-            // 0  一般来说没有面部，植物花草动物应该都是0的
-            // 1 可以认为是有一个面部存在
-            // 大于 1 一般认为存在多张面部
-
-            Log.e("Camera", "mFaceNum: " + mFaceNum);
         }
     };
 
