@@ -21,7 +21,9 @@ public final class CameraParams implements Parcelable {
     int mMaxFps;
 
     /**
-     * Camera.Parameters.FOCUS_MODE_AUTO
+     * Camera.Parameters.FOCUS_MODE_AUTO 兜底选择
+     * Camera.Parameters.FOCUS_MODE_CONTINUOUS_VIDEO 适用于录像
+     * Camera.Parameters.FOCUS_MODE_CONTINUOUS_PICTURE 适用于拍照
      */
     String mFocusMode = Camera.Parameters.FOCUS_MODE_CONTINUOUS_PICTURE;
 

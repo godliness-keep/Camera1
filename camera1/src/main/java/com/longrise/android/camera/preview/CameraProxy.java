@@ -7,6 +7,7 @@ import android.graphics.ImageFormat;
 import android.hardware.Camera;
 import android.media.ExifInterface;
 import android.support.annotation.Nullable;
+import android.util.Log;
 import android.view.Surface;
 
 import java.io.IOException;
@@ -72,6 +73,21 @@ final class CameraProxy {
             return Camera.Parameters.FOCUS_MODE_AUTO;
         }
         return supportedFocusModes.get(0);
+    }
+
+    static void printSupportFocusMode(Camera.Parameters parameters) {
+        final List<String> supportedFocusModes = parameters.getSupportedFocusModes();
+        for (String mode : supportedFocusModes) {
+            Log.e(TAG, "focus mode: " + mode);
+        }
+    }
+
+    static boolean isSupportFocusMode(Camera.Parameters parameters, String expectMode) {
+        final List<String> supportedFocusModes = parameters.getSupportedFocusModes();
+        if (supportedFocusModes.contains(expectMode)) {
+            return true;
+        }
+        return false;
     }
 
     @Nullable

@@ -2,7 +2,6 @@ package com.longrise.android.face.verify;
 
 import android.app.Activity;
 import android.content.Intent;
-import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.hardware.Camera;
 import android.os.Build;
@@ -10,7 +9,6 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Base64;
-import android.util.Log;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
@@ -139,14 +137,6 @@ public final class FaceVerifyActivity extends AppCompatActivity {
             if (mVerifyProxy != null) {
                 final String faceBase64 = Base64.encodeToString(data, Base64.DEFAULT);
                 mVerifyProxy.uploadFaceToService(faceBase64);
-            }
-
-
-            if (BuildConfig.DEBUG) {
-                final BitmapFactory.Options options = new BitmapFactory.Options();
-                options.inJustDecodeBounds = true;
-                BitmapFactory.decodeByteArray(data, 0, data.length, options);
-                Log.e("FaceVerifyActivity", "take picture width: " + options.outWidth + " height: " + options.outHeight);
             }
         }
     };

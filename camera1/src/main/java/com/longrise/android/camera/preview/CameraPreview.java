@@ -32,7 +32,7 @@ public final class CameraPreview extends SurfaceView implements Handler.Callback
     private boolean mSupportFaceDetection;
 
     private Camera.PictureCallback mJpegCallback;
-    private Camera.AutoFocusCallback mAutoFocusCallback;
+//    private Camera.AutoFocusCallback mAutoFocusCallback;
 
 //    /**
 //     * 自动对焦控制
@@ -185,7 +185,7 @@ public final class CameraPreview extends SurfaceView implements Handler.Callback
             if (mCamera != null) {
                 configPreviewParameters();
                 // 根据配置创建自动对焦控制器
-                createSensorControllerFromConfig();
+//                createSensorControllerFromConfig();
             }
         }
     }
@@ -221,10 +221,10 @@ public final class CameraPreview extends SurfaceView implements Handler.Callback
             if (enableFaceDetection()) {
                 startFaceDetection();
             }
-            if (params().mCameraId == Camera.CameraInfo.CAMERA_FACING_BACK) {
-                // After the first turn on, auto focus once
-                setAutoFocus();
-            }
+//            if (params().mCameraId == Camera.CameraInfo.CAMERA_FACING_BACK) {
+            // After the first turn on, auto focus once
+//                setAutoFocus();
+//            }
         }
     }
 
@@ -303,6 +303,17 @@ public final class CameraPreview extends SurfaceView implements Handler.Callback
         printLog("rotation: " + mOrientation);
     }
 
+    private void configFocusMode(Camera.Parameters basic) {
+        final String focusMode = params().mFocusMode;
+        final boolean support = CameraProxy.isSupportFocusMode(basic, focusMode);
+        if (support) {
+            basic.setFocusMode(focusMode);
+        }else{
+            printLog("current focus mode: " + basic.getFocusMode());
+            // 此时不支持配置的对焦模式
+        }
+    }
+
     private Camera.Parameters configBasicParamseters(Camera.Parameters basic) {
         final CameraConfig config = this.mConfig;
         if (config.mStateListener != null) {
@@ -312,9 +323,7 @@ public final class CameraPreview extends SurfaceView implements Handler.Callback
         basic.setPreviewFormat(CameraProxy.getSupportPreviewFormat(basic));
         basic.setPictureFormat(ImageFormat.JPEG);
         basic.setJpegQuality(params().mImageQuality);
-        final String focusMode = CameraProxy.getSupportFocusMode(basic, params().mFocusMode);
-        basic.setFocusMode(focusMode);
-        printLog("focusMode: " + focusMode);
+        configFocusMode(basic);
         // set preview fps range[min,max]
         final int[] fpsRanges = CameraProxy.getSupportedPreviewFpsRange(basic, params().mMinFps, params().mMaxFps);
         if (fpsRanges != null) {
@@ -330,15 +339,15 @@ public final class CameraPreview extends SurfaceView implements Handler.Callback
         return basic;
     }
 
-    private void setAutoFocus() {
-        if (mCamera != null) {
-            try {
-                mCamera.autoFocus(getAutoFocusCallback());
-            } catch (Exception e) {
-                notifyStatusToUser(Status.MSG_AUTO_FOCUS_FAILED, e);
-            }
-        }
-    }
+//    private void setAutoFocus() {
+//        if (mCamera != null) {
+//            try {
+//                mCamera.autoFocus(getAutoFocusCallback());
+//            } catch (Exception e) {
+//                notifyStatusToUser(Status.MSG_AUTO_FOCUS_FAILED, e);
+//            }
+//        }
+//    }
 
     private CameraParams params() {
         return mConfig.params();
@@ -347,7 +356,7 @@ public final class CameraPreview extends SurfaceView implements Handler.Callback
     /**
      * 根据配置决定是否要创建自动对焦控制器
      */
-    private void createSensorControllerFromConfig() {
+//    private void createSensorControllerFromConfig() {
 //        if (params().mCameraId == Camera.CameraInfo.CAMERA_FACING_BACK) {
 //            if (mSensorController == null) {
 //                mSensorController = new SensorController(getContext());
@@ -362,7 +371,7 @@ public final class CameraPreview extends SurfaceView implements Handler.Callback
 //                mSensorController.lockFocus();
 //            }
 //        }
-    }
+//    }
 
 //    private SensorController.CameraFocusListener getCameraFocusListener() {
 //        if (mCameraFocusListener == null) {
@@ -376,7 +385,6 @@ public final class CameraPreview extends SurfaceView implements Handler.Callback
 //        }
 //        return mCameraFocusListener;
 //    }
-
     private Camera.PictureCallback getJpegCallback() {
         if (mJpegCallback == null) {
             mJpegCallback = new Camera.PictureCallback() {
@@ -395,21 +403,21 @@ public final class CameraPreview extends SurfaceView implements Handler.Callback
         return mJpegCallback;
     }
 
-    private Camera.AutoFocusCallback getAutoFocusCallback() {
-        if (mAutoFocusCallback == null) {
-            mAutoFocusCallback = new Camera.AutoFocusCallback() {
-                @Override
-                public void onAutoFocus(boolean success, Camera camera) {
-                    try {
-                        mCamera.cancelAutoFocus();
-                    } catch (Exception e) {
-                        notifyStatusToUser(Status.MSG_AUTO_FOCUS_FAILED, e);
-                    }
-                }
-            };
-        }
-        return mAutoFocusCallback;
-    }
+//    private Camera.AutoFocusCallback getAutoFocusCallback() {
+//        if (mAutoFocusCallback == null) {
+//            mAutoFocusCallback = new Camera.AutoFocusCallback() {
+//                @Override
+//                public void onAutoFocus(boolean success, Camera camera) {
+//                    try {
+//                        mCamera.cancelAutoFocus();
+//                    } catch (Exception e) {
+//                        notifyStatusToUser(Status.MSG_AUTO_FOCUS_FAILED, e);
+//                    }
+//                }
+//            };
+//        }
+//        return mAutoFocusCallback;
+//    }
 
     private void startFaceDetection() {
         if (enableFaceDetection()) {
