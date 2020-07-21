@@ -68,26 +68,6 @@ public final class FaceFragment extends Fragment implements PreviewProxy, View.O
     }
 
     /**
-     * 开始人脸检测
-     */
-    @Override
-    public void startFaceDetection() {
-        if (mPreview != null) {
-            mPreview.startFaceDetection();
-        }
-    }
-
-    /**
-     * 停止人脸检测
-     */
-    @Override
-    public void stopFaceDetection() {
-        if (mPreview != null) {
-            mPreview.stopFaceDetection();
-        }
-    }
-
-    /**
      * 重新预览
      */
     @Override

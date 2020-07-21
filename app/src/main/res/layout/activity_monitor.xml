@@ -9,4 +9,12 @@
         android:layout_width="128dp"
         android:layout_height="128dp" />
 
+
+    <Button
+        android:id="@+id/support_face_detection"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:text="是否支持面部检测" />
+
 </LinearLayout>
