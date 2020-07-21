@@ -74,6 +74,14 @@ final class CameraProxy {
         return supportedFocusModes.get(0);
     }
 
+    static boolean isSupportFocusMode(Camera.Parameters parameters, String expectMode) {
+        final List<String> supportedFocusModes = parameters.getSupportedFocusModes();
+        if (supportedFocusModes.contains(expectMode)) {
+            return true;
+        }
+        return false;
+    }
+
     @Nullable
     static int[] getSupportedPreviewFpsRange(Camera.Parameters parameters, int min, int max) {
         if (min <= 0 || max <= 0) {

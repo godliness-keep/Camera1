@@ -6,12 +6,14 @@ import android.graphics.ImageFormat;
 import android.hardware.Camera;
 import android.os.Handler;
 import android.os.Message;
+import android.support.annotation.Nullable;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 
 import com.longrise.android.camera.BuildConfig;
+import com.longrise.android.camera.focus.SensorController;
 
 /**
  * Created by godliness on 2020-07-01.
@@ -34,12 +36,13 @@ public final class CameraPreview extends SurfaceView implements Handler.Callback
     private Camera.PictureCallback mJpegCallback;
     private Camera.AutoFocusCallback mAutoFocusCallback;
 
-//    /**
-//     * 自动对焦控制
-//     */
-//    @Nullable
-//    private SensorController mSensorController;
-//    private SensorController.CameraFocusListener mCameraFocusListener;
+    /**
+     * 自动对焦控制
+     */
+    @Nullable
+    private SensorController mSensorController;
+    private SensorController.CameraFocusListener mCameraFocusListener;
+    private boolean mSupportConfigFocusMode;
 
     /**
      * 开启预览
@@ -61,9 +64,9 @@ public final class CameraPreview extends SurfaceView implements Handler.Callback
         if (!mConfig.checkTakePicture()) {
             return;
         }
-//        if (mSensorController != null) {
-//            mSensorController.lockFocus();
-//        }
+        if (mSensorController != null) {
+            mSensorController.lockFocus();
+        }
         takePictureOnAutoFocus();
     }
 
@@ -88,9 +91,9 @@ public final class CameraPreview extends SurfaceView implements Handler.Callback
      * 开启自动对焦
      */
     public void onStart() {
-//        if (mSensorController != null) {
-//            mSensorController.onStart();
-//        }
+        if (mSensorController != null) {
+            mSensorController.onStart();
+        }
         printLog("onStart");
     }
 
@@ -98,9 +101,9 @@ public final class CameraPreview extends SurfaceView implements Handler.Callback
      * 停止自动对焦
      */
     public void onStop() {
-//        if (mSensorController != null) {
-//            mSensorController.onStop();
-//        }
+        if (mSensorController != null) {
+            mSensorController.onStop();
+        }
         printLog("onStop");
     }
 
@@ -185,7 +188,7 @@ public final class CameraPreview extends SurfaceView implements Handler.Callback
             if (mCamera != null) {
                 configPreviewParameters();
                 // 根据配置创建自动对焦控制器
-                createSensorControllerFromConfig();
+//                createSensorControllerFromConfig();
             }
         }
     }
@@ -221,8 +224,9 @@ public final class CameraPreview extends SurfaceView implements Handler.Callback
             if (enableFaceDetection()) {
                 startFaceDetection();
             }
-            if (params().mCameraId == Camera.CameraInfo.CAMERA_FACING_BACK) {
-                // After the first turn on, auto focus once
+
+            //After the first turn on, auto focus once
+            if (!mSupportConfigFocusMode && params().mCameraId == Camera.CameraInfo.CAMERA_FACING_BACK) {
                 setAutoFocus();
             }
         }
@@ -243,7 +247,7 @@ public final class CameraPreview extends SurfaceView implements Handler.Callback
         if (enableFaceDetection()) {
             mCamera.setFaceDetectionListener(config.mFaceDetectionListener);
         }
-        printLog("SupportFaceDetection: " + mSupportFaceDetection);
+        printLog("supportFaceDetection: " + mSupportFaceDetection);
     }
 
     private void releaseCamera() {
@@ -303,6 +307,19 @@ public final class CameraPreview extends SurfaceView implements Handler.Callback
         printLog("rotation: " + mOrientation);
     }
 
+    private void configFocusMode(Camera.Parameters basic) {
+        final String focusMode = params().mFocusMode;
+        this.mSupportConfigFocusMode = CameraProxy.isSupportFocusMode(basic, focusMode);
+        if (mSupportConfigFocusMode) {
+            basic.setFocusMode(focusMode);
+        } else {
+            printLog("current focus mode: " + basic.getFocusMode());
+            // 此时不支持配置的对焦模式
+            // 开启传感器控制对焦模式
+            createSensorControllerFromConfig();
+        }
+    }
+
     private Camera.Parameters configBasicParamseters(Camera.Parameters basic) {
         final CameraConfig config = this.mConfig;
         if (config.mStateListener != null) {
@@ -312,9 +329,7 @@ public final class CameraPreview extends SurfaceView implements Handler.Callback
         basic.setPreviewFormat(CameraProxy.getSupportPreviewFormat(basic));
         basic.setPictureFormat(ImageFormat.JPEG);
         basic.setJpegQuality(params().mImageQuality);
-        final String focusMode = CameraProxy.getSupportFocusMode(basic, params().mFocusMode);
-        basic.setFocusMode(focusMode);
-        printLog("focusMode: " + focusMode);
+        configFocusMode(basic);
         // set preview fps range[min,max]
         final int[] fpsRanges = CameraProxy.getSupportedPreviewFpsRange(basic, params().mMinFps, params().mMaxFps);
         if (fpsRanges != null) {
@@ -348,43 +363,43 @@ public final class CameraPreview extends SurfaceView implements Handler.Callback
      * 根据配置决定是否要创建自动对焦控制器
      */
     private void createSensorControllerFromConfig() {
-//        if (params().mCameraId == Camera.CameraInfo.CAMERA_FACING_BACK) {
-//            if (mSensorController == null) {
-//                mSensorController = new SensorController(getContext());
-//                mSensorController.setCameraFocusListener(getCameraFocusListener());
-//                mSensorController.onStart();
-//            } else {
-//                mSensorController.unlockFocus();
-//                mSensorController.resetFocus();
-//            }
-//        } else {
-//            if (mSensorController != null) {
-//                mSensorController.lockFocus();
-//            }
-//        }
+        if (params().mCameraId == Camera.CameraInfo.CAMERA_FACING_BACK) {
+            if (mSensorController == null) {
+                mSensorController = new SensorController(getContext());
+                mSensorController.setCameraFocusListener(getCameraFocusListener());
+                mSensorController.onStart();
+            } else {
+                mSensorController.unlockFocus();
+                mSensorController.resetFocus();
+            }
+        } else {
+            if (mSensorController != null) {
+                mSensorController.lockFocus();
+            }
+        }
     }
 
-//    private SensorController.CameraFocusListener getCameraFocusListener() {
-//        if (mCameraFocusListener == null) {
-//            mCameraFocusListener = new SensorController.CameraFocusListener() {
-//                @Override
-//                public void onFocus() {
-//                    setAutoFocus();
-//                    printLog("onFocus");
-//                }
-//            };
-//        }
-//        return mCameraFocusListener;
-//    }
+    private SensorController.CameraFocusListener getCameraFocusListener() {
+        if (mCameraFocusListener == null) {
+            mCameraFocusListener = new SensorController.CameraFocusListener() {
+                @Override
+                public void onFocus() {
+                    setAutoFocus();
+                    printLog("onFocus");
+                }
+            };
+        }
+        return mCameraFocusListener;
+    }
 
     private Camera.PictureCallback getJpegCallback() {
         if (mJpegCallback == null) {
             mJpegCallback = new Camera.PictureCallback() {
                 @Override
                 public void onPictureTaken(byte[] data, Camera camera) {
-//                    if (mSensorController != null) {
-//                        mSensorController.unlockFocus();
-//                    }
+                    if (mSensorController != null) {
+                        mSensorController.unlockFocus();
+                    }
                     final JpegCallback jpegCallback = mConfig.mJpegCallback;
                     if (jpegCallback != null) {
                         jpegCallback.onJpegTaken(data, camera);
