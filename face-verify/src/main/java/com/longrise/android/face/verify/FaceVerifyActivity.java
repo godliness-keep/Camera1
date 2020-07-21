@@ -36,6 +36,9 @@ public final class FaceVerifyActivity extends AppCompatActivity {
 
     private Runnable mDelayResult;
 
+    private int mFaceNum;
+    private boolean mVerifyResult;
+
     /**
      * 开启面部识别
      */
@@ -58,6 +61,7 @@ public final class FaceVerifyActivity extends AppCompatActivity {
                 .previewStatusCallback(mStatusListener)
                 .pictureCallback(null, null, mJpegCallback)
                 .takeInterceptListener(mInterceptListener)
+                .faceDetectionListener(mFaceDetectionListener)
                 .translucentStatus()
                 .commitAndSaveState(savedInstanceState, Window.ID_ANDROID_CONTENT);
 
@@ -70,6 +74,7 @@ public final class FaceVerifyActivity extends AppCompatActivity {
         if (mVerifyProxy != null) {
             mVerifyProxy.destroy();
         }
+        removeDelayResult();
         super.onDestroy();
     }
 
@@ -81,7 +86,7 @@ public final class FaceVerifyActivity extends AppCompatActivity {
             @Override
             public void verifyTimeout() {
                 if (mProxy != null) {
-                    mProxy.notifyVerifyFailed("服务繁忙，请您稍后再试...");
+                    mProxy.notifyVerifyFailed(getString(R.string.moduleverify_string_query_max_count));
                 }
             }
 
@@ -98,8 +103,9 @@ public final class FaceVerifyActivity extends AppCompatActivity {
              * 验证成功*/
             @Override
             public void verifySuccess(String... msg) {
+                mVerifyResult = true;
                 if (msg == null || msg.length <= 0) {
-                    setSuccessToResult();
+                    finish();
                 } else {
                     if (mProxy != null) {
                         mProxy.notifyVerifySuccess(msg);
@@ -145,8 +151,22 @@ public final class FaceVerifyActivity extends AppCompatActivity {
 
         @Override
         public boolean interceptTakePicture() {
-            // todo 是否拦截拍照
+            if (mProxy.isSupportFaceDetection()) {
+                if (mFaceNum == 1) {
+                    return false;
+                } else {
+                    mProxy.notifyVerifyFailed(getString(R.string.moduleverify_string_face_in_range));
+                    return true;
+                }
+            }
             return false;
+        }
+    };
+
+    private final Camera.FaceDetectionListener mFaceDetectionListener = new Camera.FaceDetectionListener() {
+        @Override
+        public void onFaceDetection(Camera.Face[] faces, Camera camera) {
+            mFaceNum = faces != null ? faces.length : 0;
         }
     };
 
@@ -190,11 +210,13 @@ public final class FaceVerifyActivity extends AppCompatActivity {
         }
     }
 
-    private void setSuccessToResult() {
+
+    @Override
+    public void finish() {
         final Intent intent = new Intent();
-        intent.putExtra(VerifyConsts.RESULT_VERIFY_STATUS, true);
+        intent.putExtra(VerifyConsts.RESULT_VERIFY_STATUS, mVerifyResult);
         setResult(Activity.RESULT_OK, intent);
-        finish();
+        super.finish();
     }
 
     private Runnable getDelayResult() {
@@ -202,7 +224,7 @@ public final class FaceVerifyActivity extends AppCompatActivity {
             mDelayResult = new Runnable() {
                 @Override
                 public void run() {
-                    setSuccessToResult();
+                    finish();
                 }
             };
         }
@@ -210,11 +232,16 @@ public final class FaceVerifyActivity extends AppCompatActivity {
     }
 
     private void delaySetSuccessToResult() {
+        final View temp = removeDelayResult();
+        temp.postDelayed(getDelayResult(), PreviewProxy.TIP_TIME_OUT);
+    }
+
+    private View removeDelayResult() {
         final View temp = findViewById(Window.ID_ANDROID_CONTENT);
         if (mDelayResult != null) {
             temp.removeCallbacks(mDelayResult);
         }
-        temp.postDelayed(getDelayResult(), PreviewProxy.TIP_TIME_OUT);
+        return temp;
     }
 
     private void onRestoreState() {
