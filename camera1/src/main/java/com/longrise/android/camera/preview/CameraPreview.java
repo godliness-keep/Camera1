@@ -131,6 +131,17 @@ public final class CameraPreview extends SurfaceView implements Handler.Callback
 
     @Override
     public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {
+        if (holder.getSurface() == null) {
+            // preview surface does not exist
+            return;
+        }
+
+        try {
+            mCamera.stopPreview();
+        } catch (Exception e) {
+            // ignore: tried to stop a non-existent preview
+        }
+
         startPreview();
     }
 

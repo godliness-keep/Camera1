@@ -4,7 +4,6 @@ import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Color;
 import android.hardware.Camera;
-import android.media.FaceDetector;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
