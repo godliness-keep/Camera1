@@ -1,5 +1,7 @@
 package com.longrise.android.camera1;
 
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.hardware.Camera;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -10,6 +12,7 @@ import android.view.View;
 import com.longrise.android.camera.preview.CameraConfig;
 import com.longrise.android.camera.preview.CameraParams;
 import com.longrise.android.camera.preview.CameraPreview;
+import com.longrise.android.camera.preview.JpegCallback;
 import com.longrise.android.camera.preview.ParamsCallback;
 import com.longrise.android.camera.preview.PreviewFrameCallback;
 import com.longrise.android.camera.preview.PreviewStatusListener;
@@ -33,6 +36,7 @@ public final class MonitoringActivity extends AppCompatActivity {
         final CameraConfig config = preview.openPreview();
         config.params(mParamsCallback);
         config.previewCallback(mFrameCallback);
+        config.takePicture(null, null, mJpegCallback);
         config.previewStatusListener(mPreviewStatusListener);
         config.faceDetectionListener(mFaceDetectionListener);
 
@@ -41,6 +45,13 @@ public final class MonitoringActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Log.e(TAG, "supportFaceDetection: " + preview.isSupportFaceDetection());
+            }
+        });
+
+        findViewById(R.id.tv_take_picture).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                preview.takePicture();
             }
         });
     }
@@ -76,6 +87,14 @@ public final class MonitoringActivity extends AppCompatActivity {
         @Override
         public void onCameraOpened(Camera.Parameters basic) {
 
+        }
+    };
+
+    private final JpegCallback mJpegCallback = new JpegCallback() {
+        @Override
+        public void onJpegTaken(byte[] data, Camera camera) {
+            final Bitmap pic = BitmapFactory.decodeByteArray(data, 0, data.length);
+            Log.e(TAG, "width: " + pic.getWidth() + " height: " + pic.getHeight());
         }
     };
 
