@@ -7,22 +7,24 @@ import android.hardware.Camera;
  *
  * @author godliness
  */
-final class PreviewFrame implements Camera.PreviewCallback {
+final class PreviewFrameImpl implements Camera.PreviewCallback {
 
     private final PreviewFrameCallback mFrameCallback;
     private final int mWidth;
     private final int mHeight;
+    private final int mPreviewFormat;
 
-    PreviewFrame(int width, int height, PreviewFrameCallback frameCallback) {
+    PreviewFrameImpl(int width, int height, int previewFormat, PreviewFrameCallback frameCallback) {
         this.mFrameCallback = frameCallback;
         this.mWidth = width;
         this.mHeight = height;
+        this.mPreviewFormat = previewFormat;
     }
 
     @Override
     public void onPreviewFrame(byte[] data, Camera camera) {
         if (mFrameCallback != null) {
-            mFrameCallback.onPreviewFrame(data, mWidth, mHeight);
+            mFrameCallback.onPreviewFrame(data, mWidth, mHeight, mPreviewFormat);
         }
     }
 }

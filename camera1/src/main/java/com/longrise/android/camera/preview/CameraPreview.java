@@ -198,8 +198,6 @@ public final class CameraPreview extends SurfaceView implements Handler.Callback
 
             if (mCamera != null) {
                 configPreviewParameters();
-                // 根据配置创建自动对焦控制器
-//                createSensorControllerFromConfig();
             }
         }
     }
@@ -243,12 +241,12 @@ public final class CameraPreview extends SurfaceView implements Handler.Callback
         }
     }
 
-    private void configCamera(int width, int height) {
+    private void configCamera(int width, int height, int previewFormat) {
         final CameraConfig config = mConfig;
         final PreviewFrameCallback previewCallback = config.mPreviewCallback;
         try {
             if (previewCallback != null) {
-                mCamera.setPreviewCallback(new PreviewFrame(width, height, previewCallback));
+                mCamera.setPreviewCallback(new PreviewFrameImpl(width, height, previewFormat, previewCallback));
             }
         } catch (Exception e) {
             notifyStatusToUser(Status.CAMERA_SET_PREVIEW_FAILED, e);
@@ -301,7 +299,7 @@ public final class CameraPreview extends SurfaceView implements Handler.Callback
         final Camera.Size size = CameraProxy.calcOptimaSize(preview.getSupportedPreviewSizes(), width, height);
         preview.setPreviewSize(size.width, size.height);
         // preview frame callback
-        configCamera(size.width, size.height);
+        configCamera(size.width, size.height, preview.getPreviewFormat());
 
         printLog("configPreviewParameters width: " + size.width + " height: " + size.height);
     }

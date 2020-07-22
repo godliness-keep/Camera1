@@ -157,11 +157,6 @@ public final class FacePreviewActivity extends AppCompatActivity implements View
                 @Override
                 public void onResourceReady(@NonNull Bitmap resource, @Nullable Transition<? super Bitmap> transition) {
                     mIvFace.setImageBitmap(resource);
-
-                    FaceDetector faceDetector = new FaceDetector(resource.getWidth(), resource.getHeight(), 5);
-                    FaceDetector.Face[] faces = new FaceDetector.Face[5];
-                    final int count = faceDetector.findFaces(resource, faces);
-                    Log.e("bindData", "count: " +  count);
                 }
             });
         }

@@ -25,10 +25,12 @@ public final class FaceBuilder {
     Camera.ShutterCallback mShutterCallback;
     Camera.PictureCallback mRawCallback;
     JpegCallback mJpegCallback;
+
     PreviewStatusListener mStatusCallback;
     PreviewFrameCallback mPreviewCallback;
     Camera.FaceDetectionListener mDetectonListener;
     TakeInterceptListener mInterceptListener;
+
     boolean mTranslucentStatus;
 
     private final AppCompatActivity mHost;
