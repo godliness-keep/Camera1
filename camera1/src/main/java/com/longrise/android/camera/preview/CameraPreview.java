@@ -236,7 +236,7 @@ public final class CameraPreview extends SurfaceView implements Handler.Callback
                 startFaceDetection();
             }
 
-            //After the first turn on, auto focus once
+            // After the first turn on, auto focus once
             if (!mSupportConfigFocusMode && params().mCameraId == Camera.CameraInfo.CAMERA_FACING_BACK) {
                 setAutoFocus();
             }
@@ -328,6 +328,7 @@ public final class CameraPreview extends SurfaceView implements Handler.Callback
             // 此时不支持配置的对焦模式
             // 开启传感器控制对焦模式
             createSensorControllerFromConfig();
+            printLog("open sensor focus mode");
         }
     }
 
@@ -337,7 +338,7 @@ public final class CameraPreview extends SurfaceView implements Handler.Callback
             config.mStateListener.onCameraOpened(basic);
         }
 
-        basic.setPreviewFormat(CameraProxy.getSupportPreviewFormat(basic));
+//        basic.setPreviewFormat(CameraProxy.getSupportPreviewFormat(basic));
         basic.setPictureFormat(ImageFormat.JPEG);
         basic.setJpegQuality(params().mImageQuality);
         configFocusMode(basic);
@@ -396,7 +397,7 @@ public final class CameraPreview extends SurfaceView implements Handler.Callback
                 @Override
                 public void onFocus() {
                     setAutoFocus();
-                    printLog("onFocus");
+                    printLog("sensor onFocus");
                 }
             };
         }
