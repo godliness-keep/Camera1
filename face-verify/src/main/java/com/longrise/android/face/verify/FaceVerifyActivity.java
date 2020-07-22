@@ -19,6 +19,7 @@ import com.longrise.android.camera.TakeInterceptListener;
 import com.longrise.android.camera.preview.CameraParams;
 import com.longrise.android.camera.preview.JpegCallback;
 import com.longrise.android.camera.preview.ParamsCallback;
+import com.longrise.android.camera.preview.PreviewFrameCallback;
 import com.longrise.android.camera.preview.PreviewStatusListener;
 import com.longrise.android.camera.preview.Status;
 import com.longrise.android.face.verify.common.VerifyConsts;
@@ -155,7 +156,7 @@ public final class FaceVerifyActivity extends AppCompatActivity {
         @Override
         public boolean interceptTakePicture() {
             if (mProxy.isSupportFaceDetection()) {
-                if (mFaceNum == 1) {
+                if (mFaceNum >= 1) {
                     return false;
                 } else {
                     mProxy.notifyVerifyFailed(getString(R.string.moduleverify_string_face_in_range));

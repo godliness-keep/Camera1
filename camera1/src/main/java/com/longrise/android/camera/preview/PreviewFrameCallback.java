@@ -18,14 +18,15 @@ public interface PreviewFrameCallback {
      * for the arrangement of the pixel data in the preview callback
      * buffers.
      *
-     * @param data   the contents of the preview frame in the format defined
-     *               by {@link android.graphics.ImageFormat}, which can be queried
-     *               with {@link android.hardware.Camera.Parameters#getPreviewFormat()}.
-     *               If {@link android.hardware.Camera.Parameters#setPreviewFormat(int)}
-     *               is never called, the default will be the YCbCr_420_SP
-     *               (NV21) format.
-     * @param width  the preview width.
-     * @param height thie preview height.
+     * @param data        the contents of the preview frame in the format defined
+     *                    by {@link android.graphics.ImageFormat}, which can be queried
+     *                    with {@link android.hardware.Camera.Parameters#getPreviewFormat()}.
+     *                    If {@link android.hardware.Camera.Parameters#setPreviewFormat(int)}
+     *                    is never called, the default will be the YCbCr_420_SP
+     *                    (NV21) format.
+     * @param width       the preview width.
+     * @param height      thie preview height.
+     * @param frameFormat this preview format {@link android.graphics.ImageFormat}
      */
-    void onPreviewFrame(byte[] data, int width, int height);
+    void onPreviewFrame(byte[] data, int width, int height, int frameFormat);
 }
