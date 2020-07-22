@@ -153,12 +153,7 @@ public final class FacePreviewActivity extends AppCompatActivity implements View
         }
 
         if (!TextUtils.isEmpty(mPreviewPath)) {
-            Glide.with(this).asBitmap().load(mPreviewPath).centerCrop().into(new SimpleTarget<Bitmap>() {
-                @Override
-                public void onResourceReady(@NonNull Bitmap resource, @Nullable Transition<? super Bitmap> transition) {
-                    mIvFace.setImageBitmap(resource);
-                }
-            });
+            Glide.with(this).asBitmap().load(mPreviewPath).centerCrop().into(mIvFace);
         }
     }
 
