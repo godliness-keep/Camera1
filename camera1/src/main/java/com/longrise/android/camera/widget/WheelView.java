@@ -37,9 +37,11 @@ public final class WheelView extends View {
     private int mEndColor;
 
     private Paint mWheelPaint;
+    private Paint mWheelPaint1;
 
     private RectF mRectF;
     private LinearGradient mGradient;
+    private LinearGradient mGradient1;
     private Animation mRotateAnimation;
 
     private final Context mCxt;
@@ -120,6 +122,7 @@ public final class WheelView extends View {
         mRadius += DpUtil.dip2px(cxt, 16);
 
         createWheelPaint();
+        createWheelPaint1();
     }
 
     @Override
@@ -137,7 +140,7 @@ public final class WheelView extends View {
                 0,
                 90,
                 false,
-                mWheelPaint);
+                mWheelPaint1);
     }
 
     private void createWheelPaint() {
@@ -149,6 +152,17 @@ public final class WheelView extends View {
         mWheelPaint.setFilterBitmap(true);
 
         mWheelPaint.setShader(createIfGradient());
+    }
+
+    private void createWheelPaint1() {
+        mWheelPaint1 = new Paint();
+        mWheelPaint1.setStrokeWidth(16);
+        mWheelPaint1.setStrokeCap(Paint.Cap.ROUND);
+        mWheelPaint1.setStyle(Paint.Style.STROKE);
+        mWheelPaint1.setAntiAlias(true);
+        mWheelPaint1.setFilterBitmap(true);
+
+        mWheelPaint1.setShader(createIfGradient1());
     }
 
     private LinearGradient createIfGradient() {
@@ -164,6 +178,21 @@ public final class WheelView extends View {
             );
         }
         return mGradient;
+    }
+
+    private LinearGradient createIfGradient1() {
+        if (mGradient1 == null) {
+            mGradient1 = new LinearGradient(
+                    mRadiusX - mRadius,
+                    mRadiusY,
+                    mRadiusX,
+                    mRadiusY - mRadius,
+                    new int[]{mStartColor, mEndColor},
+                    null,
+                    Shader.TileMode.MIRROR
+            );
+        }
+        return mGradient1;
     }
 
     private RectF createIfRectF() {
