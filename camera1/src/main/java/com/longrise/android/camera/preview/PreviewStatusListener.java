@@ -11,12 +11,16 @@ import android.hardware.Camera;
 public interface PreviewStatusListener {
 
     /**
-     * 预览状态{@link Status}
+     * 预览状态
+     *
+     * @param status {@link Status}
+     * @param extra  extra desc
      */
     void onPreviewStatus(int status, String extra);
 
     /**
      * 相机已打开
+     * @param basic 详细配置参数
      */
     void onCameraOpened(Camera.Parameters basic);
 }

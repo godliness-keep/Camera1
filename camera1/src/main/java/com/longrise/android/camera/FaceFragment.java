@@ -22,6 +22,7 @@ import com.longrise.android.camera.widget.WheelView;
  * Created by godliness on 2020-07-04.
  *
  * @author godliness
+ * 面部识别Fragment
  */
 public final class FaceFragment extends Fragment implements PreviewProxy, View.OnClickListener {
 
