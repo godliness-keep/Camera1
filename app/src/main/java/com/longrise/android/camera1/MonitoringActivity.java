@@ -35,7 +35,6 @@ public final class MonitoringActivity extends AppCompatActivity {
         final CameraPreview preview = findViewById(R.id.camera_preview);
         final CameraConfig config = preview.openPreview();
         config.params(mParamsCallback);
-        config.previewCallback(mFrameCallback);
         config.takePicture(null, null, mJpegCallback);
         config.previewStatusListener(mPreviewStatusListener);
         config.faceDetectionListener(mFaceDetectionListener);
@@ -55,12 +54,6 @@ public final class MonitoringActivity extends AppCompatActivity {
             }
         });
     }
-
-    private final PreviewFrameCallback mFrameCallback = new PreviewFrameCallback() {
-        @Override
-        public void onPreviewFrame(byte[] data, int width, int height) {
-        }
-    };
 
     private final ParamsCallback mParamsCallback = new ParamsCallback() {
         @Override
