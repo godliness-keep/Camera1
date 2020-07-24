@@ -183,10 +183,10 @@ public final class WheelView extends View {
     private LinearGradient createIfGradient1() {
         if (mGradient1 == null) {
             mGradient1 = new LinearGradient(
-                    mRadiusX - mRadius,
+                    mRadiusX + mRadius,
                     mRadiusY,
                     mRadiusX,
-                    mRadiusY - mRadius,
+                    mRadiusY + mRadius,
                     new int[]{mStartColor, mEndColor},
                     null,
                     Shader.TileMode.MIRROR
