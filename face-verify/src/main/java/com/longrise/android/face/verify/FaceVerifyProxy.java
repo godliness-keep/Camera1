@@ -105,6 +105,9 @@ public final class FaceVerifyProxy implements Handler.Callback {
                         mProxyListener.verifySuccess(msg);
                     }
 
+                    // 查询次数清零
+                    mRetryCount = 0;
+
                     printLog("faceMatchSuccess: " + mRetryCount);
                 }
 
@@ -116,6 +119,9 @@ public final class FaceVerifyProxy implements Handler.Callback {
                     if (mProxyListener != null) {
                         mProxyListener.verifyFailed(msg);
                     }
+
+                    // 查询次数清零
+                    mRetryCount = 0;
 
                     printLog("faceMatchFailed: " + mRetryCount);
                 }
