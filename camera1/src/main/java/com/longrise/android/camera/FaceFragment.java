@@ -143,6 +143,7 @@ public final class FaceFragment extends Fragment implements PreviewProxy, View.O
             final TakeInterceptListener intercept = mBuilder.mInterceptListener;
             if (intercept == null || !intercept.interceptTakePicture()) {
                 takePicture();
+                setTips(null);
             }
         }
     }
