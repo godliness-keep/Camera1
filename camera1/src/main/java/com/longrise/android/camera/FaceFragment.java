@@ -11,6 +11,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import com.longrise.android.camera.assist.TimerAssist;
 import com.longrise.android.camera.preview.CameraConfig;
 import com.longrise.android.camera.preview.CameraParams;
 import com.longrise.android.camera.preview.CameraPreview;
@@ -66,6 +67,14 @@ public final class FaceFragment extends Fragment implements PreviewProxy, View.O
     @Override
     public boolean isSupportFaceDetection() {
         return mPreview != null && mPreview.isSupportFaceDetection();
+    }
+
+    /**
+     * 是否上传成功30秒内
+     */
+    @Override
+    public boolean isUploadInThirty() {
+        return TimerAssist.getInstance() != null && TimerAssist.getInstance().getIsIntercept();
     }
 
     /**
@@ -141,8 +150,14 @@ public final class FaceFragment extends Fragment implements PreviewProxy, View.O
     public void onClick(View v) {
         if (v.getId() == R.id.tv_take_picture) {
             final TakeInterceptListener intercept = mBuilder.mInterceptListener;
+            final UploadInterceptListener uploadIntercept = mBuilder.mUploadInterceptListener;
+
             if (intercept == null || !intercept.interceptTakePicture()) {
-                takePicture();
+                if (uploadIntercept !=null &&uploadIntercept.interceptUploadPicture()) {
+                    startWheel();
+                }else {
+                    takePicture();
+                }
             }
         }
     }

@@ -16,6 +16,8 @@ import android.view.WindowManager;
 import com.longrise.android.camera.FaceBuilder;
 import com.longrise.android.camera.PreviewProxy;
 import com.longrise.android.camera.TakeInterceptListener;
+import com.longrise.android.camera.UploadInterceptListener;
+import com.longrise.android.camera.assist.TimerAssist;
 import com.longrise.android.camera.preview.CameraParams;
 import com.longrise.android.camera.preview.JpegCallback;
 import com.longrise.android.camera.preview.ParamsCallback;
@@ -61,6 +63,7 @@ public final class FaceVerifyActivity extends AppCompatActivity {
                 .previewStatusCallback(mStatusListener)
                 .pictureCallback(null, null, mJpegCallback)
                 .takeInterceptListener(mInterceptListener)
+                .uploadInterceptListener(mUploadInterceptListener)
                 .faceDetectionListener(mFaceDetectionListener)
                 .translucentStatus()
                 .commitAndSaveState(savedInstanceState, Window.ID_ANDROID_CONTENT);
@@ -161,6 +164,22 @@ public final class FaceVerifyActivity extends AppCompatActivity {
                     mProxy.notifyVerifyFailed(getString(R.string.moduleverify_string_face_in_range));
                     return true;
                 }
+            }
+            return false;
+        }
+    };
+
+    /**
+     * 局部业务拦截(拦截拍照和上传 直接查询)
+     */
+    private final UploadInterceptListener mUploadInterceptListener = new UploadInterceptListener() {
+
+        @Override
+        public boolean interceptUploadPicture() {
+            if (mProxy.isUploadInThirty()) {
+                mProxy.hideTakePicture();
+                mVerifyProxy.queryMatchResult(TimerAssist.getInstance().getFaceMatchId());
+                return true;
             }
             return false;
         }

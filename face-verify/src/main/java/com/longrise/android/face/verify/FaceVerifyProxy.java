@@ -5,6 +5,8 @@ import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
 
+import com.longrise.android.camera.assist.TimerAssist;
+
 /**
  * Created by godliness on 2020-07-07.
  *
@@ -38,6 +40,11 @@ public final class FaceVerifyProxy implements Handler.Callback {
 
     void uploadFaceToService(String base64) {
         FaceMatchRegistry.getRegistry().uploadFacePhoto(base64, getUploadCallback());
+    }
+
+    void queryMatchResult(String id){
+        printLog(id);
+        queryMatchResult(id,mDelayRetrys[0]);
     }
 
     void destroy() {
@@ -74,6 +81,8 @@ public final class FaceVerifyProxy implements Handler.Callback {
                     }
                     queryMatchResult(id, mDelayRetrys[0]);
 
+                    TimerAssist.getInstance().startPlayerTimer(id);
+
                     printLog("uploadFaceSuccess");
                 }
 
@@ -108,6 +117,9 @@ public final class FaceVerifyProxy implements Handler.Callback {
                     // 查询次数清零
                     mRetryCount = 0;
 
+                    //倒计时释放
+                    TimerAssist.getInstance().timerRelease();
+
                     printLog("faceMatchSuccess: " + mRetryCount);
                 }
 
@@ -122,6 +134,9 @@ public final class FaceVerifyProxy implements Handler.Callback {
 
                     // 查询次数清零
                     mRetryCount = 0;
+
+                    //倒计时释放
+                    TimerAssist.getInstance().timerRelease();
 
                     printLog("faceMatchFailed: " + mRetryCount);
                 }

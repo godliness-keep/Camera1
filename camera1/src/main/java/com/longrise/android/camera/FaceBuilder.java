@@ -30,6 +30,7 @@ public final class FaceBuilder {
     PreviewFrameCallback mPreviewCallback;
     Camera.FaceDetectionListener mDetectonListener;
     TakeInterceptListener mInterceptListener;
+    UploadInterceptListener mUploadInterceptListener;
 
     boolean mTranslucentStatus;
 
@@ -72,6 +73,14 @@ public final class FaceBuilder {
      */
     public FaceBuilder takeInterceptListener(TakeInterceptListener interceptListener) {
         this.mInterceptListener = interceptListener;
+        return this;
+    }
+
+    /**
+     * 局部业务拦截器(拦截拍照上传 直接匹配id)
+     */
+    public FaceBuilder uploadInterceptListener(UploadInterceptListener uploadInterceptListener) {
+        this.mUploadInterceptListener = uploadInterceptListener;
         return this;
     }
 

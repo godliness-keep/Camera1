@@ -47,5 +47,12 @@ public interface PreviewProxy {
      * @return support or ...
      */
     boolean isSupportFaceDetection();
+
+    /**
+     * 是否上传后30秒内
+     *
+     * @return
+     */
+    boolean isUploadInThirty();
 }
 
