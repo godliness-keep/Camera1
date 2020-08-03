@@ -11,7 +11,7 @@ package com.longrise.android.camera;
 public interface TakeInterceptListener {
 
     /**
-     * 是否拦截拍照 true 表示拦截
+     * 是否拦截拍照， true 表示拦截
      */
     boolean interceptTakePicture();
 }

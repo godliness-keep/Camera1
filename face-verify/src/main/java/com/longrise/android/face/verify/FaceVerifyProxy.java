@@ -5,6 +5,9 @@ import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
 
+import com.longrise.android.face.verify.assist.TimerAssist;
+
+
 /**
  * Created by godliness on 2020-07-07.
  *
@@ -40,6 +43,11 @@ public final class FaceVerifyProxy implements Handler.Callback {
         FaceMatchRegistry.getRegistry().uploadFacePhoto(base64, getUploadCallback());
     }
 
+    void queryMatchResult(String id) {
+        printLog(id);
+        queryMatchResult(id, mDelayRetrys[0]);
+    }
+
     void destroy() {
         mDestroy = true;
         mHandler.removeCallbacksAndMessages(null);
@@ -69,10 +77,11 @@ public final class FaceVerifyProxy implements Handler.Callback {
             mUploadCallback = new FaceUploadCallback() {
                 @Override
                 public void uploadFaceSuccess(String id) {
-                    if (mDestroy) {
-                        return;
+                    if (!mDestroy) {
+                        queryMatchResult(id, mDelayRetrys[0]);
                     }
-                    queryMatchResult(id, mDelayRetrys[0]);
+                    // 创建匹配查询倒计时器
+                    TimerAssist.createPlayerTimer(id);
 
                     printLog("uploadFaceSuccess");
                 }
@@ -99,12 +108,13 @@ public final class FaceVerifyProxy implements Handler.Callback {
                 @Override
                 public void faceMatchSuccess(String... msg) {
                     if (mDestroy) {
-                        return;
+                        TimerAssist.stagingMatchResult(true, msg);
+                    } else {
+                        if (mProxyListener != null) {
+                            mProxyListener.verifySuccess(msg);
+                        }
+                        TimerAssist.stopPlayerTimer();
                     }
-                    if (mProxyListener != null) {
-                        mProxyListener.verifySuccess(msg);
-                    }
-
                     // 查询次数清零
                     mRetryCount = 0;
 
@@ -114,12 +124,13 @@ public final class FaceVerifyProxy implements Handler.Callback {
                 @Override
                 public void faceMatchFailed(String msg) {
                     if (mDestroy) {
-                        return;
+                        TimerAssist.stagingMatchResult(false, msg);
+                    } else {
+                        if (mProxyListener != null) {
+                            mProxyListener.verifyFailed(msg);
+                        }
+                        TimerAssist.stopPlayerTimer();
                     }
-                    if (mProxyListener != null) {
-                        mProxyListener.verifyFailed(msg);
-                    }
-
                     // 查询次数清零
                     mRetryCount = 0;
 

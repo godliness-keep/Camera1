@@ -27,8 +27,6 @@ import com.longrise.android.camera.utils.DpUtil;
  */
 public final class WheelView extends View {
 
-    private static final String TAG = "WheelView";
-
     private float mRadiusX;
     private float mRadiusY;
     private float mOffsetY;
@@ -183,10 +181,10 @@ public final class WheelView extends View {
     private LinearGradient createIfGradient1() {
         if (mGradient1 == null) {
             mGradient1 = new LinearGradient(
-                    mRadiusX - mRadius,
+                    mRadiusX + mRadius,
                     mRadiusY,
                     mRadiusX,
-                    mRadiusY - mRadius,
+                    mRadiusY + mRadius,
                     new int[]{mStartColor, mEndColor},
                     null,
                     Shader.TileMode.MIRROR

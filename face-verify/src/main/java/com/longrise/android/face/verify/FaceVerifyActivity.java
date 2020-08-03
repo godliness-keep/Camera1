@@ -21,6 +21,7 @@ import com.longrise.android.camera.preview.JpegCallback;
 import com.longrise.android.camera.preview.ParamsCallback;
 import com.longrise.android.camera.preview.PreviewStatusListener;
 import com.longrise.android.camera.preview.Status;
+import com.longrise.android.face.verify.assist.TimerAssist;
 import com.longrise.android.face.verify.common.VerifyConsts;
 
 /**
@@ -33,6 +34,7 @@ public final class FaceVerifyActivity extends AppCompatActivity {
 
     private PreviewProxy mProxy;
     private FaceVerifyProxy mVerifyProxy;
+    private FaceVerifyProxy.FaceProxyListener mProxyListener;
 
     private Runnable mDelayResult;
 
@@ -79,7 +81,7 @@ public final class FaceVerifyActivity extends AppCompatActivity {
     }
 
     private void createVerifyProxy() {
-        mVerifyProxy = new FaceVerifyProxy(new FaceVerifyProxy.FaceProxyListener() {
+        mProxyListener = new FaceVerifyProxy.FaceProxyListener() {
 
             /**
              * 超过查询次数*/
@@ -113,7 +115,8 @@ public final class FaceVerifyActivity extends AppCompatActivity {
                     delaySetSuccessToResult();
                 }
             }
-        });
+        };
+        mVerifyProxy = new FaceVerifyProxy(mProxyListener);
     }
 
     /**
@@ -154,15 +157,12 @@ public final class FaceVerifyActivity extends AppCompatActivity {
 
         @Override
         public boolean interceptTakePicture() {
-            if (mProxy.isSupportFaceDetection()) {
-                if (mFaceNum >= 1) {
-                    return false;
-                } else {
-                    mProxy.notifyVerifyFailed(getString(R.string.moduleverify_string_face_in_range));
-                    return true;
-                }
+            if (interceptUploadPicture()) {
+                // 拦截复用面部识别排队
+                return true;
             }
-            return false;
+            // 拦截非人脸拍照
+            return interceptFaceDetection();
         }
     };
 
@@ -202,6 +202,50 @@ public final class FaceVerifyActivity extends AppCompatActivity {
         }
     };
 
+    /**
+     * 局部业务拦截(拦截拍照和上传 直接查询)
+     */
+    private boolean interceptUploadPicture() {
+        if (TimerAssist.isIntercept()) {
+            final TimerAssist.FaceMatchResult matchResult = TimerAssist.hasMatchResult();
+            if (matchResult != null) {
+                recycleMatchResult(matchResult);
+            } else {
+                mProxy.hideTakePicture();
+                mVerifyProxy.queryMatchResult(TimerAssist.getFaceMatchId());
+            }
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * 复用匹配结果
+     */
+    private void recycleMatchResult(TimerAssist.FaceMatchResult matchResult) {
+        if (matchResult.matchResult()) {
+            mProxyListener.verifySuccess(matchResult.desc());
+        } else {
+            mProxyListener.verifyFailed(matchResult.desc());
+        }
+        matchResult.recycle();
+    }
+
+    /**
+     * 拦截非人脸拍照
+     */
+    private boolean interceptFaceDetection() {
+        if (mProxy.isSupportFaceDetection()) {
+            if (mFaceNum >= 1) {
+                return false;
+            } else {
+                mProxy.notifyVerifyFailed(getString(R.string.moduleverify_string_face_in_range));
+                return true;
+            }
+        }
+        return false;
+    }
+
     private void beforeSetContentView() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             final Window window = getWindow();
@@ -215,7 +259,6 @@ public final class FaceVerifyActivity extends AppCompatActivity {
             window.setNavigationBarColor(Color.TRANSPARENT);
         }
     }
-
 
     @Override
     public void finish() {

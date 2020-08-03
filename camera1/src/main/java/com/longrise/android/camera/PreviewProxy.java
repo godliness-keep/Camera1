@@ -47,5 +47,6 @@ public interface PreviewProxy {
      * @return support or ...
      */
     boolean isSupportFaceDetection();
+
 }
 

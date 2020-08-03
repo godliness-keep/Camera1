@@ -4,6 +4,7 @@ import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.annotation.StringRes;
 import android.support.v4.app.Fragment;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
@@ -16,6 +17,7 @@ import com.longrise.android.camera.preview.CameraParams;
 import com.longrise.android.camera.preview.CameraPreview;
 import com.longrise.android.camera.preview.ParamsCallback;
 import com.longrise.android.camera.utils.DpUtil;
+import com.longrise.android.camera.utils.StrUtil;
 import com.longrise.android.camera.widget.WheelView;
 
 /**
@@ -38,6 +40,7 @@ public final class FaceFragment extends Fragment implements PreviewProxy, View.O
 
     @Override
     public void setAutoFocus() {
+        // do nothing
     }
 
     /**
@@ -47,7 +50,7 @@ public final class FaceFragment extends Fragment implements PreviewProxy, View.O
     public void notifyVerifyFailed(String msg) {
         stopWheel();
         setTips(msg);
-        resetTakePicture();
+        resetTakePicture(true, R.string.modulecamera_reset_take);
     }
 
     /**
@@ -56,8 +59,8 @@ public final class FaceFragment extends Fragment implements PreviewProxy, View.O
     @Override
     public void notifyVerifySuccess(String... msg) {
         stopWheel();
-        setTips(tipToString(msg));
-        hideTakePicture();
+        setTips(StrUtil.arrayToString(msg));
+        resetTakePicture(false, R.string.modulecamera_string_start_verify);
     }
 
     /**
@@ -83,9 +86,9 @@ public final class FaceFragment extends Fragment implements PreviewProxy, View.O
      */
     @Override
     public void hideTakePicture() {
-        if (mTakePicture != null) {
-            mTakePicture.setVisibility(View.GONE);
-        }
+        hideTakePicture1();
+        // 状态互斥
+        startWheel();
     }
 
     static FaceFragment newInstance(CameraParams params) {
@@ -254,22 +257,16 @@ public final class FaceFragment extends Fragment implements PreviewProxy, View.O
         }
     }
 
-    private void resetTakePicture() {
+    private void resetTakePicture(boolean show, @StringRes int resid) {
         if (mTakePicture != null) {
-            mTakePicture.setVisibility(View.VISIBLE);
-            mTakePicture.setText(getString(R.string.modulecamera_reset_take));
+            mTakePicture.setVisibility(show ? View.VISIBLE : View.GONE);
+            mTakePicture.setText(resid);
         }
     }
 
-    private String tipToString(String... msg) {
-        final int length;
-        if (msg == null || (length = msg.length) <= 0) {
-            return null;
+    private void hideTakePicture1() {
+        if (mTakePicture != null) {
+            mTakePicture.setVisibility(View.GONE);
         }
-        final StringBuilder b = new StringBuilder();
-        for (int i = 0; i < length; i++) {
-            b.append(msg[i]);
-        }
-        return b.toString();
     }
 }

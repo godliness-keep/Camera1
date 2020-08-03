@@ -77,6 +77,7 @@ public class MainActivity extends AppCompatActivity {
         FaceMatchRegistry.getRegistry().registerMatchListener(new FaceMatchRegistry.FaceMatchListener() {
             @Override
             public void onMatchResult(String id, final FaceVerifyProxy.FaceMatchCallback callback) {
+
                 Log.e(TAG, "onMatchResult");
 
                 // todo 在这里完成查询匹配结果

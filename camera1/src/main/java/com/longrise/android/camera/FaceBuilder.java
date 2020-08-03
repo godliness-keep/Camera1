@@ -9,10 +9,10 @@ import android.support.v7.app.AppCompatActivity;
 
 import com.longrise.android.camera.preview.CameraParams;
 import com.longrise.android.camera.preview.JpegCallback;
-import com.longrise.android.camera.preview.PreviewFrameCallback;
-import com.longrise.android.camera.preview.Status;
 import com.longrise.android.camera.preview.ParamsCallback;
+import com.longrise.android.camera.preview.PreviewFrameCallback;
 import com.longrise.android.camera.preview.PreviewStatusListener;
+import com.longrise.android.camera.preview.Status;
 
 
 /**
