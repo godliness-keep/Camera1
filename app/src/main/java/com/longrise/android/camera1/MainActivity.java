@@ -18,6 +18,7 @@ import com.longrise.android.face.verify.common.VerifyConsts;
 import java.util.Random;
 
 
+
 public class MainActivity extends AppCompatActivity {
 
     private static final String TAG = "MainActivity";
@@ -51,6 +52,14 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 final Intent intent = new Intent(MainActivity.this, MonitoringActivity.class);
+                startActivity(intent);
+            }
+        });
+
+        findViewById(R.id.detector).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                final Intent intent = new Intent(MainActivity.this, FaceDetectDemo.class);
                 startActivity(intent);
             }
         });

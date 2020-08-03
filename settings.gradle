@@ -1,2 +1,5 @@
-include ':app', ':face-verify',
-        ':camera1'
+include ':app',
+        ':face-verify',
+        ':camera1',
+        ':face-detector'
+
