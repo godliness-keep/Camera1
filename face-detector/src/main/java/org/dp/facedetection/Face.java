@@ -3,10 +3,10 @@ package org.dp.facedetection;
 import org.opencv.core.Rect;
 
 /**
+ * Created by godliness on 2020-08-03.
+ *
+ * @author godliness
  * 识别出的人脸信息
- * <p>
- * Stay Hungry Stay Foolish
- * Author: dp on 2019/3/25 12:51
  */
 public final class Face {
     public Rect faceRect;
