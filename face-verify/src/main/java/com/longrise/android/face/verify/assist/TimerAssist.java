@@ -72,7 +72,7 @@ public class TimerAssist extends CountDownTimer {
     }
 
     /**
-     * 是否存在未消费的查询结果，注意该方法只能获取一次
+     * 是否存在未消费的查询结果
      */
     public static FaceMatchResult hasMatchResult() {
         if (sTimer != null) {

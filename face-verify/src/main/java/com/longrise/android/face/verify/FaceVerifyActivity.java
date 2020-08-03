@@ -203,7 +203,7 @@ public final class FaceVerifyActivity extends AppCompatActivity {
     };
 
     /**
-     * 局部业务拦截(拦截拍照和上传 直接查询)
+     * 复用面部识别排队 30s
      */
     private boolean interceptUploadPicture() {
         if (TimerAssist.isIntercept()) {
