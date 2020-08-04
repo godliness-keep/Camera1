@@ -15,7 +15,7 @@
             android:layout_gravity="center_vertical"
             android:paddingLeft="16dp"
             android:paddingRight="16dp"
-            android:src="@drawable/modulebase_bb_titlebar_ic_back" />
+            android:src="@drawable/moduleface_bb_titlebar_ic_back" />
 
         <TextView
             android:layout_width="wrap_content"
