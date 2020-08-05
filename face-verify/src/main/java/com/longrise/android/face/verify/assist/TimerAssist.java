@@ -2,6 +2,8 @@ package com.longrise.android.face.verify.assist;
 
 import android.os.CountDownTimer;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.BaseRequestOptions;
 import com.longrise.android.camera.utils.StrUtil;
 
 /**
