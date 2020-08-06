@@ -5,17 +5,14 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.StringRes;
-import android.support.v4.app.Fragment;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import com.longrise.android.camera.preview.CameraConfig;
-import com.longrise.android.camera.preview.CameraParams;
+import com.longrise.android.camera.base.BaseFragment;
 import com.longrise.android.camera.preview.CameraPreview;
-import com.longrise.android.camera.preview.ParamsCallback;
 import com.longrise.android.camera.utils.DpUtil;
 import com.longrise.android.camera.utils.StrUtil;
 import com.longrise.android.camera.widget.WheelView;
@@ -26,22 +23,15 @@ import com.longrise.android.camera.widget.WheelView;
  * @author godliness
  * 面部识别Fragment
  */
-public final class FaceFragment extends Fragment implements PreviewProxy, View.OnClickListener {
+public final class FaceFragment extends BaseFragment<FaceBuilder> implements FacePreviewProxy, View.OnClickListener {
 
     private CameraPreview mPreview;
     private WheelView mWaiting;
     private TextView mTips;
     private TextView mTakePicture;
 
-    private CameraParams mParams;
-    private FaceBuilder mBuilder;
-
     private Runnable mTipRunnable;
-
-    @Override
-    public void setAutoFocus() {
-        // do nothing
-    }
+    private FaceBuilder mBuilder;
 
     /**
      * 通知面部匹配失败
@@ -64,24 +54,6 @@ public final class FaceFragment extends Fragment implements PreviewProxy, View.O
     }
 
     /**
-     * 是否支持面部匹配
-     */
-    @Override
-    public boolean isSupportFaceDetection() {
-        return mPreview != null && mPreview.isSupportFaceDetection();
-    }
-
-    /**
-     * 重新预览
-     */
-    @Override
-    public void restartPreview() {
-        if (mPreview != null) {
-            mPreview.restartPreview();
-        }
-    }
-
-    /**
      * 隐藏拍照
      */
     @Override
@@ -91,75 +63,50 @@ public final class FaceFragment extends Fragment implements PreviewProxy, View.O
         startWheel();
     }
 
-    static FaceFragment newInstance(CameraParams params) {
-        final FaceFragment faceFragment = new FaceFragment();
-        final Bundle extra = new Bundle();
-        extra.putParcelable(CameraParams.EXTRA_PREVIEW_PARAMS, params);
-        faceFragment.setArguments(extra);
-        return faceFragment;
+    @Override
+    public void takePicture() {
+        startWheel();
+        if (mPreview != null) {
+            mPreview.takePicture();
+        }
     }
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        if (savedInstanceState == null) {
-            getExtraData();
-        } else {
-            onRestoreState(savedInstanceState);
-        }
         return inflater.inflate(R.layout.modulecamera_fragment_face, container, false);
     }
 
     @Override
-    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
-        mPreview = getView().findViewById(R.id.camera_preview);
-        mWaiting = getView().findViewById(R.id.wheel_view);
-        mTips = getView().findViewById(R.id.tv_verify_tips);
-        mTakePicture = getView().findViewById(R.id.tv_take_picture);
+    protected void initView() {
+        mPreview = findViewById(R.id.camera_preview);
+        mWaiting = findViewById(R.id.wheel_view);
+        mTips = findViewById(R.id.tv_verify_tips);
+        mTakePicture = findViewById(R.id.tv_take_picture);
         mTakePicture.setOnClickListener(this);
-        openPreview(mBuilder);
-        if (mBuilder.mTranslucentStatus) {
+    }
+
+    @Override
+    protected void configBuilder(FaceBuilder builder) {
+        this.mBuilder = builder;
+        if (builder.mTranslucentStatus) {
             adjustTipsLocation();
         }
     }
 
     @Override
-    public void onStart() {
-        super.onStart();
-        if (mPreview != null) {
-            mPreview.onStart();
-        }
-    }
-
-    @Override
-    public void onStop() {
-        super.onStop();
-        if (mPreview != null) {
-            mPreview.onStop();
-        }
+    protected CameraPreview preview() {
+        return mPreview;
     }
 
     @Override
     public void onClick(View v) {
         if (v.getId() == R.id.tv_take_picture) {
-            final TakeInterceptListener intercept = mBuilder.mInterceptListener;
+            final FaceInterceptListener intercept = mBuilder.mInterceptListener;
             if (intercept == null || !intercept.interceptTakePicture()) {
                 takePicture();
                 setTips(null);
             }
-        }
-    }
-
-    PreviewProxy commit(FaceBuilder builder) {
-        this.mBuilder = builder;
-        return this;
-    }
-
-    private void takePicture() {
-        startWheel();
-        if (mPreview != null) {
-            mPreview.takePicture();
         }
     }
 
@@ -173,46 +120,6 @@ public final class FaceFragment extends Fragment implements PreviewProxy, View.O
         if (mWaiting != null) {
             mWaiting.stopRotate();
         }
-    }
-
-    private void openPreview(FaceBuilder builder) {
-        final CameraConfig config = mPreview.openPreview();
-        config.previewStatusListener(builder.mStatusCallback);
-        config.takePicture(builder.mShutterCallback, builder.mRawCallback, builder.mJpegCallback);
-        config.previewCallback(builder.mPreviewCallback);
-        config.faceDetectionListener(builder.mDetectonListener);
-        config.params(new ParamsPackage(mParams));
-    }
-
-    @Override
-    public void onSaveInstanceState(@NonNull Bundle outState) {
-        super.onSaveInstanceState(outState);
-        outState.putParcelable(CameraParams.EXTRA_PREVIEW_PARAMS, mParams);
-    }
-
-    private static class ParamsPackage implements ParamsCallback {
-
-        private final CameraParams mParams;
-
-        ParamsPackage(CameraParams params) {
-            this.mParams = params;
-        }
-
-        @Override
-        public CameraParams params() {
-            return mParams;
-        }
-    }
-
-    private void getExtraData() {
-        final Bundle extra = getArguments();
-        if (extra != null) {
-            this.mParams = extra.getParcelable(CameraParams.EXTRA_PREVIEW_PARAMS);
-        }
-    }
-
-    private void onRestoreState(Bundle state) {
-        this.mParams = state.getParcelable(CameraParams.EXTRA_PREVIEW_PARAMS);
     }
 
     private void setTips(String msg) {

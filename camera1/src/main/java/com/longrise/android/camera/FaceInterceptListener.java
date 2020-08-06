@@ -8,7 +8,7 @@ package com.longrise.android.camera;
  * 1、拍照拦截
  * 2、暂无
  */
-public interface TakeInterceptListener {
+public interface FaceInterceptListener {
 
     /**
      * 是否拦截拍照， true 表示拦截

@@ -14,8 +14,9 @@ import android.view.Window;
 import android.view.WindowManager;
 
 import com.longrise.android.camera.FaceBuilder;
-import com.longrise.android.camera.PreviewProxy;
-import com.longrise.android.camera.TakeInterceptListener;
+import com.longrise.android.camera.FacePreviewProxy;
+import com.longrise.android.camera.base.PreviewProxy;
+import com.longrise.android.camera.FaceInterceptListener;
 import com.longrise.android.camera.preview.CameraParams;
 import com.longrise.android.camera.preview.JpegCallback;
 import com.longrise.android.camera.preview.ParamsCallback;
@@ -32,7 +33,7 @@ import com.longrise.android.face.verify.common.VerifyConsts;
  */
 public final class FaceVerifyActivity extends AppCompatActivity {
 
-    private PreviewProxy mProxy;
+    private FacePreviewProxy mProxy;
     private FaceVerifyProxy mVerifyProxy;
     private FaceVerifyProxy.FaceProxyListener mProxyListener;
 
@@ -153,7 +154,7 @@ public final class FaceVerifyActivity extends AppCompatActivity {
     /**
      * 业务拦截
      */
-    private final TakeInterceptListener mInterceptListener = new TakeInterceptListener() {
+    private final FaceInterceptListener mInterceptListener = new FaceInterceptListener() {
 
         @Override
         public boolean interceptTakePicture() {
@@ -282,7 +283,7 @@ public final class FaceVerifyActivity extends AppCompatActivity {
 
     private void delaySetSuccessToResult() {
         final View temp = removeDelayResult();
-        temp.postDelayed(getDelayResult(), PreviewProxy.TIP_TIME_OUT);
+        temp.postDelayed(getDelayResult(), FacePreviewProxy.TIP_TIME_OUT);
     }
 
     private View removeDelayResult() {

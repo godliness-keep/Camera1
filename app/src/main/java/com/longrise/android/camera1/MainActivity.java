@@ -13,10 +13,10 @@ import com.longrise.android.face.verify.FaceMatchRegistry;
 import com.longrise.android.face.verify.FacePreviewActivity;
 import com.longrise.android.face.verify.FaceVerifyActivity;
 import com.longrise.android.face.verify.FaceVerifyProxy;
-import com.longrise.android.face.verify.common.VerifyConsts;
+import com.longrise.android.face.verify.verify.CardParams;
+import com.longrise.android.face.verify.verify.FaceCardActivity;
 
 import java.util.Random;
-
 
 
 public class MainActivity extends AppCompatActivity {
@@ -61,18 +61,53 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View v) {
                 final Intent intent = new Intent(MainActivity.this, FaceDetectDemo.class);
                 startActivity(intent);
+
             }
         });
+
+        findViewById(R.id.upload).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                final Intent intent = new Intent(MainActivity.this, FaceCardActivity.class);
+                final CardParams params = new CardParams();
+                intent.putExtra(CardParams.EXTRA_CARD_PARAMS, params);
+                startActivity(intent);
+            }
+        });
+
+    }
+
+
+    private FaceMatchRegistry.FaceUploadListener mUploadListener;
+    private FaceMatchRegistry.FaceMatchListener mMatchListener;
+
+    private FaceMatchRegistry.FaceUploadListener getUploadListener() {
+        if (mUploadListener == null) {
+            mUploadListener = new FaceMatchRegistry.FaceUploadListener() {
+                @Override
+                public void onUploadFacePhoto(String base64, @NonNull FaceVerifyProxy.FaceUploadCallback callback) {
+
+                }
+            };
+        }
+        return mUploadListener;
+    }
+
+    private FaceMatchRegistry.FaceMatchListener getMatchListener() {
+        if (mMatchListener == null) {
+            mMatchListener = new FaceMatchRegistry.FaceMatchListener() {
+                @Override
+                public void onMatchResult(String id, @NonNull FaceVerifyProxy.FaceMatchCallback callback) {
+
+                }
+            };
+        }
+        return mMatchListener;
     }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == VerifyConsts.REQUEST_VERIFY_CODE) {
-            if (data != null && data.getBooleanExtra(VerifyConsts.RESULT_VERIFY_STATUS, false)) {
-                // todo 识别通过
-            }
-        }
     }
 
     @Override

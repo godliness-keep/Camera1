@@ -1,4 +1,6 @@
-package com.longrise.android.camera;
+package com.longrise.android.camera.base;
+
+import android.os.Bundle;
 
 /**
  * Created by godliness on 2020-06-26.
@@ -8,13 +10,14 @@ package com.longrise.android.camera;
 public interface PreviewProxy {
 
     /**
-     * 提示超时时间
-     */
-    int TIP_TIME_OUT = 3000;
-    /**
-     * 保存状态key
+     * 保存状态 key
      */
     String KEY = "Preview-Fragment";
+
+    /**
+     * 拍照
+     */
+    void takePicture();
 
     /**
      * 手动对焦
@@ -27,26 +30,10 @@ public interface PreviewProxy {
     void restartPreview();
 
     /**
-     * 隐藏拍照
-     */
-    void hideTakePicture();
-
-    /**
-     * 通知匹配失败
-     */
-    void notifyVerifyFailed(String msg);
-
-    /**
-     * 通知匹配成功
-     */
-    void notifyVerifySuccess(String... msg);
-
-    /**
      * 是否支持面部检测
      *
      * @return support or ...
      */
     boolean isSupportFaceDetection();
-
 }
 

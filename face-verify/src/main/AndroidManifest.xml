@@ -9,6 +9,10 @@
         <activity
             android:name=".FaceVerifyActivity"
             android:screenOrientation="portrait" />
+
+        <activity
+            android:name=".verify.FaceCardActivity"
+            android:screenOrientation="portrait" />
     </application>
 
 </manifest>

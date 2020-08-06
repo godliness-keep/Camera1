@@ -65,7 +65,7 @@ public final class FacePreviewActivity extends AppCompatActivity implements View
         } else {
             onRestoreState();
         }
-        setContentView(R.layout.activity_face_preivew);
+        setContentView(R.layout.moduleface_activity_face_preivew);
         initView();
     }
 
@@ -104,7 +104,7 @@ public final class FacePreviewActivity extends AppCompatActivity implements View
         final int id = v.getId();
         if (id == R.id.tv_start_verify) {
             beforeStartVerify();
-        } else if (id == R.id.iv_back_face_preview) {
+        } else if (id == R.id.iv_back) {
             finish();
         }
     }
@@ -116,7 +116,7 @@ public final class FacePreviewActivity extends AppCompatActivity implements View
     }
 
     private void initView() {
-        mBack = findViewById(R.id.iv_back_face_preview);
+        mBack = findViewById(R.id.iv_back);
         mVerify = findViewById(R.id.tv_start_verify);
         mIvFace = findViewById(R.id.round_iv_face);
         mFaceName = findViewById(R.id.tv_face_name);
@@ -156,7 +156,7 @@ public final class FacePreviewActivity extends AppCompatActivity implements View
         final SpannableStringBuilder style = new SpannableStringBuilder(getString(R.string.moduleverify_string_security_verify));
         style.append("\n").append(getString(R.string.moduleverify_string_security_prove)).append(mName).append(getString(R.string.moduleverify_string_security_exam));
         final int nameLength = mName.length();
-        style.setSpan(new ForegroundColorSpan(getResources().getColor(R.color.modulebase_color_btn_yellow_normal)), 12, 12 + nameLength, Spannable.SPAN_EXCLUSIVE_INCLUSIVE);
+        style.setSpan(new ForegroundColorSpan(getResources().getColor(R.color.moduleface_color_yellow_normal)), 12, 12 + nameLength, Spannable.SPAN_EXCLUSIVE_INCLUSIVE);
         style.setSpan(new AbsoluteSizeSpan(18, true), 12, 12 + nameLength, Spannable.SPAN_EXCLUSIVE_INCLUSIVE);
         return style;
     }
