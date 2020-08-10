@@ -12,7 +12,9 @@ import android.util.Base64;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
+import android.widget.Toast;
 
+import com.longrise.android.camera.BackInterceptListener;
 import com.longrise.android.camera.FaceBuilder;
 import com.longrise.android.camera.PreviewProxy;
 import com.longrise.android.camera.TakeInterceptListener;
@@ -63,6 +65,7 @@ public final class FaceVerifyActivity extends AppCompatActivity {
                 .previewStatusCallback(mStatusListener)
                 .pictureCallback(null, null, mJpegCallback)
                 .takeInterceptListener(mInterceptListener)
+                .backInterceptListener(mBackInterceptListener)
                 .faceDetectionListener(mFaceDetectionListener)
                 .translucentStatus()
                 .commitAndSaveState(savedInstanceState, Window.ID_ANDROID_CONTENT);
@@ -147,6 +150,18 @@ public final class FaceVerifyActivity extends AppCompatActivity {
                 final String faceBase64 = Base64.encodeToString(data, Base64.DEFAULT);
                 mVerifyProxy.uploadFaceToService(faceBase64);
             }
+        }
+    };
+
+    /**
+     * 返回拦截
+     */
+    private final BackInterceptListener mBackInterceptListener = new BackInterceptListener() {
+
+        @Override
+        public boolean interceptClickBack() {
+            //若需要拦截则执行动作并return true
+            return false;
         }
     };
 

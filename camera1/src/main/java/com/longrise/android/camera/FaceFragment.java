@@ -10,6 +10,7 @@ import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.longrise.android.camera.preview.CameraConfig;
@@ -27,7 +28,7 @@ import com.longrise.android.camera.widget.WheelView;
  * 面部识别Fragment
  */
 public final class FaceFragment extends Fragment implements PreviewProxy, View.OnClickListener {
-
+    private ImageView mIvBack;
     private CameraPreview mPreview;
     private WheelView mWaiting;
     private TextView mTips;
@@ -113,6 +114,9 @@ public final class FaceFragment extends Fragment implements PreviewProxy, View.O
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
+
+        mIvBack = getView().findViewById(R.id.iv_back_face_fragment);
+        mIvBack.setOnClickListener(this);
         mPreview = getView().findViewById(R.id.camera_preview);
         mWaiting = getView().findViewById(R.id.wheel_view);
         mTips = getView().findViewById(R.id.tv_verify_tips);
@@ -148,12 +152,23 @@ public final class FaceFragment extends Fragment implements PreviewProxy, View.O
                 takePicture();
                 setTips(null);
             }
+        }else if (v.getId() == R.id.iv_back_face_fragment){
+            backIntercept();
         }
     }
 
     PreviewProxy commit(FaceBuilder builder) {
         this.mBuilder = builder;
         return this;
+    }
+
+    private void backIntercept() {
+        final BackInterceptListener backIntercept = mBuilder.mBackInterceptListener;
+        if (backIntercept == null || !backIntercept.interceptClickBack()) {
+            if (getActivity()!=null) {
+                getActivity().finish();
+            }
+        }
     }
 
     private void takePicture() {

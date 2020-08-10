@@ -30,6 +30,8 @@ public final class FaceBuilder {
     PreviewFrameCallback mPreviewCallback;
     Camera.FaceDetectionListener mDetectonListener;
     TakeInterceptListener mInterceptListener;
+    BackInterceptListener mBackInterceptListener;
+
 
     boolean mTranslucentStatus;
 
@@ -64,6 +66,14 @@ public final class FaceBuilder {
      */
     public FaceBuilder previewCallback(PreviewFrameCallback previewCallback) {
         this.mPreviewCallback = previewCallback;
+        return this;
+    }
+
+    /**
+     * 返回拦截器
+     */
+    public FaceBuilder backInterceptListener(BackInterceptListener backInterceptListener) {
+        this.mBackInterceptListener = backInterceptListener;
         return this;
     }
 
