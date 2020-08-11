@@ -1,6 +1,6 @@
 package com.longrise.android.camera;
 
-import android.content.Context;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -10,6 +10,7 @@ import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -17,7 +18,6 @@ import com.longrise.android.camera.preview.CameraConfig;
 import com.longrise.android.camera.preview.CameraParams;
 import com.longrise.android.camera.preview.CameraPreview;
 import com.longrise.android.camera.preview.ParamsCallback;
-import com.longrise.android.camera.utils.DpUtil;
 import com.longrise.android.camera.utils.StrUtil;
 import com.longrise.android.camera.widget.WheelView;
 
@@ -32,7 +32,7 @@ public final class FaceFragment extends Fragment implements PreviewProxy, View.O
     private CameraPreview mPreview;
     private WheelView mWaiting;
     private TextView mTips;
-    private TextView mTakePicture;
+    private Button mTakePicture;
 
     private CameraParams mParams;
     private FaceBuilder mBuilder;
@@ -50,7 +50,7 @@ public final class FaceFragment extends Fragment implements PreviewProxy, View.O
     @Override
     public void notifyVerifyFailed(String msg) {
         stopWheel();
-        setTips(msg);
+        setTips(msg, false);
         resetTakePicture(true, R.string.modulecamera_reset_take);
     }
 
@@ -60,7 +60,7 @@ public final class FaceFragment extends Fragment implements PreviewProxy, View.O
     @Override
     public void notifyVerifySuccess(String... msg) {
         stopWheel();
-        setTips(StrUtil.arrayToString(msg));
+        setTips(StrUtil.arrayToString(msg), true);
         resetTakePicture(false, R.string.modulecamera_string_start_verify);
     }
 
@@ -119,13 +119,11 @@ public final class FaceFragment extends Fragment implements PreviewProxy, View.O
         mIvBack.setOnClickListener(this);
         mPreview = getView().findViewById(R.id.camera_preview);
         mWaiting = getView().findViewById(R.id.wheel_view);
-        mTips = getView().findViewById(R.id.tv_verify_tips);
-        mTakePicture = getView().findViewById(R.id.tv_take_picture);
+        mTips = getView().findViewById(R.id.tv_result_mark);
+
+        mTakePicture = getView().findViewById(R.id.btn_take_picture);
         mTakePicture.setOnClickListener(this);
         openPreview(mBuilder);
-        if (mBuilder.mTranslucentStatus) {
-            adjustTipsLocation();
-        }
     }
 
     @Override
@@ -146,13 +144,13 @@ public final class FaceFragment extends Fragment implements PreviewProxy, View.O
 
     @Override
     public void onClick(View v) {
-        if (v.getId() == R.id.tv_take_picture) {
+        if (v.getId() == R.id.btn_take_picture) {
             final TakeInterceptListener intercept = mBuilder.mInterceptListener;
             if (intercept == null || !intercept.interceptTakePicture()) {
                 takePicture();
-                setTips(null);
+                setTips(null, false);
             }
-        }else if (v.getId() == R.id.iv_back_face_fragment){
+        } else if (v.getId() == R.id.iv_back_face_fragment) {
             backIntercept();
         }
     }
@@ -165,7 +163,7 @@ public final class FaceFragment extends Fragment implements PreviewProxy, View.O
     private void backIntercept() {
         final BackInterceptListener backIntercept = mBuilder.mBackInterceptListener;
         if (backIntercept == null || !backIntercept.interceptClickBack()) {
-            if (getActivity()!=null) {
+            if (getActivity() != null) {
                 getActivity().finish();
             }
         }
@@ -230,16 +228,26 @@ public final class FaceFragment extends Fragment implements PreviewProxy, View.O
         this.mParams = state.getParcelable(CameraParams.EXTRA_PREVIEW_PARAMS);
     }
 
-    private void setTips(String msg) {
+    private void setTips(String msg, boolean isPassed) {
         if (mTips != null) {
             if (TextUtils.isEmpty(msg)) {
                 mTips.setText("");
-                mTips.setBackground(null);
+                mTips.setCompoundDrawables(null, null, null, null);
             } else {
+
                 removeTips();
                 mTips.setText(msg);
-                mTips.setBackground(getResources().getDrawable(R.drawable.moduleface_shape_verify_fail));
-                mTips.postDelayed(getTipRunnable(), TIP_TIME_OUT);
+                Drawable drawable = null;
+                if (isPassed) {
+                    drawable = getContext().getResources().getDrawable(R.drawable.moduleface_icon_ok);
+                } else {
+                    drawable = getContext().getResources().getDrawable(R.drawable.moduleface_icon_fail);
+                }
+                if (drawable != null) {
+                    drawable.setBounds(0, 0, drawable.getMinimumWidth(), drawable.getMinimumHeight());
+                    mTips.setCompoundDrawables(drawable, null, null, null);
+                    mTips.postDelayed(getTipRunnable(), TIP_TIME_OUT);
+                }
             }
         }
     }
@@ -255,21 +263,11 @@ public final class FaceFragment extends Fragment implements PreviewProxy, View.O
             mTipRunnable = new Runnable() {
                 @Override
                 public void run() {
-                    setTips(null);
+                    setTips(null, false);
                 }
             };
         }
         return mTipRunnable;
-    }
-
-    private void adjustTipsLocation() {
-        final Context cxt = getContext();
-        if (cxt != null) {
-            final int lr = DpUtil.dip2px(getContext(), 16);
-            final int bottom = lr / 2;
-            final int topPadding = bottom + DpUtil.getStatusBarHeight(getContext());
-            mTips.setPadding(lr, topPadding, lr, bottom);
-        }
     }
 
     private void resetTakePicture(boolean show, @StringRes int resid) {

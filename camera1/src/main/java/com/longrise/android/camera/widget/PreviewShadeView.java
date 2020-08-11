@@ -3,11 +3,13 @@ package com.longrise.android.camera.widget;
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffXfermode;
+import android.graphics.Rect;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.util.AttributeSet;
@@ -33,6 +35,7 @@ public final class PreviewShadeView extends FrameLayout {
     private float mOffsetY;
 
     private Bitmap mEraserBitmap;
+    private Bitmap mCircleBitmap;
     private Canvas mEraserCanvas;
     private Paint mEraserPaint;
 
@@ -54,6 +57,7 @@ public final class PreviewShadeView extends FrameLayout {
         this.mOffsetY = ta.getDimension(R.styleable.PreviewShadeView_shade_offsetY, 0F);
         ta.recycle();
         setWillNotDraw(false);
+
     }
 
     @Override
@@ -71,6 +75,10 @@ public final class PreviewShadeView extends FrameLayout {
         mEraserCanvas.drawColor(mBackgroundColor);
         mEraserCanvas.drawCircle(mRadiusX, mRadiusY, mRadius, createIfPaint());
         canvas.drawBitmap(mEraserBitmap, 0, 0, null);
+
+        canvas.drawBitmap(mCircleBitmap, mRadiusX-mCircleBitmap.getWidth()/2,
+                mRadiusY-mCircleBitmap.getHeight()/2+DpUtil.dip2px(mCxt,10), null);
+
     }
 
     private void initSize(int width, int height) {
@@ -110,6 +118,8 @@ public final class PreviewShadeView extends FrameLayout {
 
     private void createEraserBitmap(int x, int y) {
         mEraserBitmap = Bitmap.createBitmap(x, y, Bitmap.Config.ARGB_8888);
+        mCircleBitmap = BitmapFactory.decodeResource(getContext().getResources()
+                ,R.drawable.moduleface_circle_bg_round);
         mEraserCanvas = new Canvas(mEraserBitmap);
     }
 
