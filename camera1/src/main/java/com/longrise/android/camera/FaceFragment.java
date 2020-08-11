@@ -119,7 +119,7 @@ public final class FaceFragment extends Fragment implements PreviewProxy, View.O
         mIvBack.setOnClickListener(this);
         mPreview = getView().findViewById(R.id.camera_preview);
         mWaiting = getView().findViewById(R.id.wheel_view);
-        mTips = getView().findViewById(R.id.tv_result_mark);
+        mTips = getView().findViewById(R.id.tv_result_tips);
 
         mTakePicture = getView().findViewById(R.id.btn_take_picture);
         mTakePicture.setOnClickListener(this);
@@ -232,23 +232,28 @@ public final class FaceFragment extends Fragment implements PreviewProxy, View.O
         if (mTips != null) {
             if (TextUtils.isEmpty(msg)) {
                 mTips.setText("");
+                mTips.setPadding(0,0,0,0);
                 mTips.setCompoundDrawables(null, null, null, null);
             } else {
-
                 removeTips();
-                mTips.setText(msg);
-                Drawable drawable = null;
-                if (isPassed) {
-                    drawable = getContext().getResources().getDrawable(R.drawable.moduleface_icon_ok);
-                } else {
-                    drawable = getContext().getResources().getDrawable(R.drawable.moduleface_icon_fail);
-                }
-                if (drawable != null) {
-                    drawable.setBounds(0, 0, drawable.getMinimumWidth(), drawable.getMinimumHeight());
-                    mTips.setCompoundDrawables(drawable, null, null, null);
-                    mTips.postDelayed(getTipRunnable(), TIP_TIME_OUT);
-                }
+                showTips(msg,isPassed);
             }
+        }
+    }
+
+    private void showTips(String msg, boolean isPassed) {
+        mTips.setText(msg);
+        Drawable drawable = null;
+        if (isPassed) {
+            drawable = getContext().getResources().getDrawable(R.drawable.moduleface_icon_ok);
+        } else {
+            drawable = getContext().getResources().getDrawable(R.drawable.moduleface_icon_fail);
+        }
+        if (drawable != null) {
+            drawable.setBounds(0, 0, drawable.getMinimumWidth(), drawable.getMinimumHeight());
+            mTips.setCompoundDrawables(drawable, null, null, null);
+            mTips.setPadding(5,3,5,3);
+            mTips.postDelayed(getTipRunnable(), TIP_TIME_OUT);
         }
     }
 

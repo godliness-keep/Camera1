@@ -30,7 +30,7 @@
         android:layout_width="220dp"
         android:layout_height="30dp"
         android:layout_gravity="center_horizontal"
-        android:layout_marginTop="75dp"
+        android:layout_marginTop="60dp"
         android:background="@drawable/moduleface_face_bg_notice"
         android:gravity="center"
         android:text="@string/modulecamera_face_take_tips"
@@ -38,28 +38,15 @@
         android:textSize="16dp" />
 
     <TextView
-        android:id="@+id/tv_verify_tips"
-        android:layout_width="190dp"
-        android:layout_height="wrap_content"
-        android:layout_above="@+id/btn_camera"
-        android:layout_gravity="center_horizontal"
-        android:layout_marginTop="240dp"
-        android:gravity="center"
-        android:minHeight="50dp"
-        android:textColor="@android:color/white"
-        android:textSize="16sp" />
-
-
-    <TextView
-        android:id="@+id/tv_result_mark"
+        android:id="@+id/tv_result_tips"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|center_horizontal"
+        android:layout_marginBottom="150dp"
+        android:background="@drawable/moduleface_face_bg_notice"
         android:text=""
         android:textColor="@android:color/white"
-        android:textSize="16dp"
-        android:layout_marginBottom="150dp"
-        />
+        android:textSize="16dp" />
 
     <Button
         android:id="@+id/btn_take_picture"

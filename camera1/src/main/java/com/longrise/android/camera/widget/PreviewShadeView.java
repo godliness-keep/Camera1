@@ -69,16 +69,12 @@ public final class PreviewShadeView extends FrameLayout {
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
-
         mEraserBitmap.eraseColor(Color.TRANSPARENT);
-
         mEraserCanvas.drawColor(mBackgroundColor);
         mEraserCanvas.drawCircle(mRadiusX, mRadiusY, mRadius, createIfPaint());
         canvas.drawBitmap(mEraserBitmap, 0, 0, null);
-
         canvas.drawBitmap(mCircleBitmap, mRadiusX-mCircleBitmap.getWidth()/2,
                 mRadiusY-mCircleBitmap.getHeight()/2+DpUtil.dip2px(mCxt,10), null);
-
     }
 
     private void initSize(int width, int height) {
@@ -114,6 +110,7 @@ public final class PreviewShadeView extends FrameLayout {
         }
 
         createEraserBitmap(width, height);
+        createCircleBitmap();
     }
 
     private void createEraserBitmap(int x, int y) {
@@ -121,6 +118,11 @@ public final class PreviewShadeView extends FrameLayout {
         mCircleBitmap = BitmapFactory.decodeResource(getContext().getResources()
                 ,R.drawable.moduleface_circle_bg_round);
         mEraserCanvas = new Canvas(mEraserBitmap);
+    }
+
+    private void createCircleBitmap() {
+        mCircleBitmap = BitmapFactory.decodeResource(getContext().getResources()
+                ,R.drawable.moduleface_circle_bg_round);
     }
 
     private Paint createIfPaint() {
