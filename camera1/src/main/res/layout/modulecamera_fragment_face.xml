@@ -54,7 +54,7 @@
         android:layout_height="80dp"
         android:layout_gravity="bottom|center_horizontal"
         android:layout_marginBottom="64dp"
-        android:background="@drawable/moduleface_btn_round_yellow"
+        android:background="@drawable/moduleface_layer_list_verify"
         android:text="@string/modulecamera_string_start_verify"
         android:textColor="@android:color/white"
         android:textSize="18sp" />
