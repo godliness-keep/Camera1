@@ -171,5 +171,4 @@ public final class SensorController implements FocusActivityLifiCycle, SensorEve
         mY = 0;
         mZ = 0;
     }
-
 }

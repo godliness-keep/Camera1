@@ -1,5 +1,0 @@
-<resources>
-    <string name="modulecamera_string_start_verify">开始识别</string>
-    <string name="modulecamera_verfiy_fail">这里显示识别的状态</string>
-    <string name="modulecamera_reset_take">重新识别</string>
-</resources>

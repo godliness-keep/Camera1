@@ -9,13 +9,12 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 
-import com.longrise.android.camera.preview.CameraConfig;
-import com.longrise.android.camera.preview.CameraParams;
-import com.longrise.android.camera.preview.CameraPreview;
-import com.longrise.android.camera.preview.JpegCallback;
-import com.longrise.android.camera.preview.ParamsCallback;
-import com.longrise.android.camera.preview.PreviewFrameCallback;
-import com.longrise.android.camera.preview.PreviewStatusListener;
+import com.longrise.android.camera.CameraConfig;
+import com.longrise.android.camera.CameraParams;
+import com.longrise.android.camera.CameraPreview;
+import com.longrise.android.camera.JpegCallback;
+import com.longrise.android.camera.ParamsCallback;
+import com.longrise.android.camera.PreviewStatusListener;
 
 /**
  * Created by godliness on 2020-07-14.
@@ -51,6 +50,7 @@ public final class MonitoringActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 preview.takePicture();
+                preview.restartPreview();
             }
         });
     }

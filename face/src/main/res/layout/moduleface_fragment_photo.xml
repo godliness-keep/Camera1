@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <FrameLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_marginTop="32dp"
+        android:background="@drawable/moduleface_layer_list_photo_shadow">
+
+        <com.longrise.android.face.widget.PhotoView
+            android:id="@+id/iv_photo"
+            android:layout_width="126dp"
+            android:layout_height="168dp"
+            android:scaleType="fitXY"
+            android:src="@drawable/moduleface_iv_default_face_card" />
+
+        <TextView
+            android:id="@+id/tv_change_photo"
+            android:layout_width="126dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom"
+            android:background="#50000000"
+            android:gravity="center"
+            android:paddingTop="8dp"
+            android:paddingBottom="8dp"
+            android:text="@string/moduleface_string_change_photo"
+            android:textColor="@android:color/white"
+            android:textSize="12sp"
+            android:visibility="gone" />
+    </FrameLayout>
+
+    <TextView
+        android:id="@+id/tv_tips"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="32dp"
+        android:layout_marginTop="32dp"
+        android:layout_marginRight="32dp"
+        android:lineSpacingExtra="4dp"
+        android:maxLines="8"
+        android:textSize="12sp"
+        tools:text="tips" />
+
+    <TextView
+        android:id="@+id/tv_commit"
+        android:layout_width="wrap_content"
+        android:layout_height="44dp"
+        android:layout_gravity="center"
+        android:layout_marginTop="32dp"
+        android:background="@drawable/moduleface_selector_yellow_btn"
+        android:gravity="center"
+        android:paddingLeft="60dp"
+        android:paddingRight="60dp"
+        android:text="@string/moduleface_string_upload_photo"
+        android:textColor="@android:color/white"
+        android:textSize="16sp" />
+</LinearLayout>

@@ -12,18 +12,19 @@ import android.util.Base64;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
+import android.widget.FrameLayout;
 
-import com.longrise.android.camera.FaceBuilder;
-import com.longrise.android.camera.FacePreviewProxy;
-import com.longrise.android.camera.base.PreviewProxy;
-import com.longrise.android.camera.FaceInterceptListener;
-import com.longrise.android.camera.preview.CameraParams;
-import com.longrise.android.camera.preview.JpegCallback;
-import com.longrise.android.camera.preview.ParamsCallback;
-import com.longrise.android.camera.preview.PreviewStatusListener;
-import com.longrise.android.camera.preview.Status;
+import com.longrise.android.camera.CameraParams;
+import com.longrise.android.camera.JpegCallback;
+import com.longrise.android.camera.ParamsCallback;
+import com.longrise.android.camera.PreviewStatusListener;
+import com.longrise.android.camera.Status;
+import com.longrise.android.face.VerifyFragment;
+import com.longrise.android.face.VerifyProxy;
+import com.longrise.android.face.listeners.FaceInterceptListener;
+import com.longrise.android.face.utils.DpUtil;
 import com.longrise.android.face.verify.assist.TimerAssist;
-import com.longrise.android.face.verify.common.VerifyConsts;
+import com.longrise.android.face.verify.assist.VerifyHelper;
 
 /**
  * Created by godliness on 2020-07-05.
@@ -31,9 +32,9 @@ import com.longrise.android.face.verify.common.VerifyConsts;
  * @author godliness
  * 面部识别
  */
-public final class FaceVerifyActivity extends AppCompatActivity {
+public final class FaceVerifyActivity extends AppCompatActivity implements View.OnClickListener {
 
-    private FacePreviewProxy mProxy;
+    private VerifyProxy mProxy;
     private FaceVerifyProxy mVerifyProxy;
     private FaceVerifyProxy.FaceProxyListener mProxyListener;
 
@@ -47,7 +48,7 @@ public final class FaceVerifyActivity extends AppCompatActivity {
      */
     public static void openFaceVerify(Activity host) {
         final Intent intent = new Intent(host, FaceVerifyActivity.class);
-        host.startActivityForResult(intent, VerifyConsts.REQUEST_VERIFY_CODE);
+        host.startActivityForResult(intent, VerifyHelper.RequestCode.VERIFY);
     }
 
     @Override
@@ -57,19 +58,26 @@ public final class FaceVerifyActivity extends AppCompatActivity {
         if (savedInstanceState != null) {
             onRestoreState();
         }
+        setContentView(R.layout.moduleverify_activity_face_verify);
+//        initBackView();
 
-        // 创建面部识别Fragment
-        mProxy = new FaceBuilder(this)
+        // 创建面部识别代理
+        mProxy = new VerifyFragment.Builder(this)
                 .params(mParamsCallback)
                 .previewStatusCallback(mStatusListener)
                 .pictureCallback(null, null, mJpegCallback)
                 .takeInterceptListener(mInterceptListener)
                 .faceDetectionListener(mFaceDetectionListener)
                 .translucentStatus()
-                .commitAndSaveState(savedInstanceState, Window.ID_ANDROID_CONTENT);
+                .commitAndSaveState(savedInstanceState, R.id.verify_content);
 
         // 创建识别代理，监听上传服务与匹配过程
         createVerifyProxy();
+    }
+
+    @Override
+    public void onClick(View v) {
+        finish();
     }
 
     @Override
@@ -203,6 +211,13 @@ public final class FaceVerifyActivity extends AppCompatActivity {
         }
     };
 
+    private void initBackView() {
+        final View back = findViewById(R.id.iv_back);
+        back.setOnClickListener(this);
+        final FrameLayout.LayoutParams lp = (FrameLayout.LayoutParams) back.getLayoutParams();
+        lp.topMargin = DpUtil.getStatusBarHeight(this) / 2;
+    }
+
     /**
      * 复用面部识别排队 30s
      */
@@ -264,8 +279,7 @@ public final class FaceVerifyActivity extends AppCompatActivity {
     @Override
     public void finish() {
         final Intent intent = new Intent();
-        intent.putExtra(VerifyConsts.RESULT_VERIFY_STATUS, mVerifyResult);
-        setResult(Activity.RESULT_OK, intent);
+        setResult(mVerifyResult ? Activity.RESULT_OK : Activity.RESULT_CANCELED, intent);
         super.finish();
     }
 
@@ -283,7 +297,7 @@ public final class FaceVerifyActivity extends AppCompatActivity {
 
     private void delaySetSuccessToResult() {
         final View temp = removeDelayResult();
-        temp.postDelayed(getDelayResult(), FacePreviewProxy.TIP_TIME_OUT);
+        temp.postDelayed(getDelayResult(), VerifyProxy.TIP_TIME_OUT);
     }
 
     private View removeDelayResult() {

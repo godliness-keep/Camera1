@@ -4,7 +4,7 @@
     android:layout_height="match_parent"
     android:orientation="vertical">
 
-    <com.longrise.android.camera.preview.CameraPreview
+    <com.longrise.android.camera.CameraPreview
         android:id="@+id/camera_preview"
         android:layout_width="128dp"
         android:layout_height="128dp" />

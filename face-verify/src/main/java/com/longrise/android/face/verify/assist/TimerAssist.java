@@ -2,9 +2,7 @@ package com.longrise.android.face.verify.assist;
 
 import android.os.CountDownTimer;
 
-import com.bumptech.glide.Glide;
-import com.bumptech.glide.request.BaseRequestOptions;
-import com.longrise.android.camera.utils.StrUtil;
+import com.longrise.android.face.verify.utils.StrUtil;
 
 /**
  * Created by YZH on 2020/7/31.
@@ -18,7 +16,7 @@ import com.longrise.android.camera.utils.StrUtil;
  * 1、 客户端消费掉之后即失效，否则即便是匹配失败的也一直被复用
  * 2、 超时 30s 即销毁
  * <p>
- * 3、如果正在排队，发生再次上传图片怎么办？是否也应该有个排队超时机制
+ * 3、如果正在排队，发生再次上传图片怎么办？替换
  * <p>
  * Client:
  * 1、如果未消费查询结果 复用本次查询结果
@@ -32,7 +30,6 @@ public class TimerAssist extends CountDownTimer {
     private boolean mReuseIntercept;
     private String mCurrentMatchId;
     private FaceMatchResult mFaceMatchResult;
-
 
     /**
      * 上传成功之后创建复用管理器

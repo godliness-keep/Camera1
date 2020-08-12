@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_gravity="center_vertical"
+    android:gravity="center"
+    android:orientation="vertical">
+
+    <TextView
+        android:id="@+id/tv_face_name"
+        tools:text="通过面部安全识别\n证明是xxx本人考试"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:lineSpacingExtra="4dp"
+        android:textColor="#333333"
+        android:textSize="16sp" />
+
+    <FrameLayout
+        android:id="@+id/fr_face"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingRight="11dp"
+            android:scaleType="centerCrop"
+            android:src="@drawable/moduleface_round_face_bg" />
+
+        <com.longrise.android.face.widget.RoundImageView
+            android:id="@+id/round_iv_face"
+            android:layout_width="188dp"
+            android:layout_height="188dp"
+            android:layout_gravity="center" />
+
+    </FrameLayout>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/moduleface_string_tips2"
+        android:textColor="#333333"
+        android:textSize="14sp" />
+
+    <TextView
+        android:id="@+id/tv_start_verify"
+        android:layout_width="64dp"
+        android:layout_height="64dp"
+        android:layout_marginTop="40dp"
+        android:background="@drawable/moduleface_layer_list_verify_disable"
+        android:gravity="center"
+        android:text="@string/moduleface_string_start_verify_unline"
+        android:textColor="@android:color/white"
+        android:textSize="14sp" />
+
+</LinearLayout>

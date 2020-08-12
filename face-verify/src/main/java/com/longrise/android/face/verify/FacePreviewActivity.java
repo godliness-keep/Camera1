@@ -2,6 +2,7 @@ package com.longrise.android.face.verify;
 
 import android.Manifest;
 import android.app.Activity;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Build;
@@ -13,18 +14,13 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
-import android.text.Spannable;
-import android.text.SpannableStringBuilder;
-import android.text.TextUtils;
-import android.text.style.AbsoluteSizeSpan;
-import android.text.style.ForegroundColorSpan;
 import android.view.View;
 import android.view.Window;
-import android.widget.TextView;
 
-import com.bumptech.glide.Glide;
-import com.longrise.android.face.verify.common.VerifyConsts;
-import com.longrise.android.face.verify.widget.RoundImageView;
+import com.longrise.android.face.PreviewFragment;
+import com.longrise.android.face.PreviewProxy;
+import com.longrise.android.face.verify.assist.VerifyHelper;
+import com.longrise.android.face.verify.verify.PhotoParams;
 
 /**
  * Created by godliness on 2020-07-07.
@@ -36,10 +32,7 @@ public final class FacePreviewActivity extends AppCompatActivity implements View
 
     private final int REQUEST_CAMERA_PERMISSION = 101;
 
-    private View mBack;
-    private View mVerify;
-    private TextView mFaceName;
-    private RoundImageView mIvFace;
+    private PreviewProxy mProxy;
 
     private String mName;
     private String mPreviewPath;
@@ -52,9 +45,9 @@ public final class FacePreviewActivity extends AppCompatActivity implements View
      */
     public static void openFacePreview(Activity host, String previewPath, String name) {
         final Intent intent = new Intent(host, FacePreviewActivity.class);
-        intent.putExtra(VerifyConsts.EXTRA_PREVIEW_PATH, previewPath);
-        intent.putExtra(VerifyConsts.EXTRA_PREVIEW_NAME, name);
-        host.startActivityForResult(intent, VerifyConsts.REQUEST_VERIFY_CODE);
+        intent.putExtra(VerifyHelper.Extra.PHOTO_URL, previewPath);
+        intent.putExtra(VerifyHelper.Extra.PHOTO_NAME, name);
+        host.startActivityForResult(intent, VerifyHelper.RequestCode.VERIFY);
     }
 
     @Override
@@ -65,17 +58,39 @@ public final class FacePreviewActivity extends AppCompatActivity implements View
         } else {
             onRestoreState();
         }
-        setContentView(R.layout.moduleface_activity_face_preivew);
-        initView();
+        setContentView(R.layout.moduleverify_activity_face_preivew);
+        findViewById(R.id.iv_back).setOnClickListener(this);
+
+        // 创建预览
+        mProxy = new PreviewFragment.Builder(this)
+                .facePreviewListener(mPreviewCallback)
+                .name(mName)
+                .previewUrl(mPreviewPath)
+                .detectLevel(PreviewFragment.DetectLevel.ALL)
+                .commitAndSaveState(savedInstanceState, R.id.preview_content);
     }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == VerifyConsts.REQUEST_VERIFY_CODE) {
-            if (data != null && data.getBooleanExtra(VerifyConsts.RESULT_VERIFY_STATUS, false)) {
-                setSuccessToResult();
-            }
+        switch (requestCode) {
+            case VerifyHelper.RequestCode.VERIFY:
+                if (VerifyHelper.getVerifyResult(resultCode)) {
+                    setSuccessToResult();
+                }
+                break;
+
+            case VerifyHelper.RequestCode.UPLOAD_PHOTO:
+                final String newPhoto = VerifyHelper.getUploadPhotoResult(resultCode, data);
+                if (newPhoto != null) {
+                    if (mProxy != null) {
+                        mProxy.restartPreview(newPhoto);
+                    }
+                }
+                break;
+
+            default:
+                break;
         }
     }
 
@@ -101,37 +116,49 @@ public final class FacePreviewActivity extends AppCompatActivity implements View
 
     @Override
     public void onClick(View v) {
-        final int id = v.getId();
-        if (id == R.id.tv_start_verify) {
-            beforeStartVerify();
-        } else if (id == R.id.iv_back) {
+        if (v.getId() == R.id.iv_back) {
             finish();
         }
     }
 
-    @Override
-    protected void onDestroy() {
-        regEvent(false);
-        super.onDestroy();
-    }
+    private final PreviewFragment.OnFacePreviewListener mPreviewCallback = new PreviewFragment.OnFacePreviewListener() {
+        @Override
+        public void onNotFoundFace() {
+            toReUploadPhoto(getString(R.string.moduleverify_string_face_not_detected));
+        }
 
-    private void initView() {
-        mBack = findViewById(R.id.iv_back);
-        mVerify = findViewById(R.id.tv_start_verify);
-        mIvFace = findViewById(R.id.round_iv_face);
-        mFaceName = findViewById(R.id.tv_face_name);
-        regEvent(true);
-        bindData();
-    }
+        @Override
+        public void onMoreThanSize(int srcWidth, int srcHeight) {
+            toReUploadPhoto(getString(R.string.moduleverify_string_face_size));
+        }
 
-    private void regEvent(boolean event) {
-        mVerify.setOnClickListener(event ? this : null);
-        mBack.setOnClickListener(event ? this : null);
+        @Override
+        public void toVerify() {
+            beforeStartVerify();
+        }
+    };
+
+    private void toReUploadPhoto(String msg) {
+        new AlertDialog.Builder(FacePreviewActivity.this)
+                .setMessage(msg)
+                .setPositiveButton(R.string.moduleverify_string_confirm, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                        final Intent intent = new Intent(FacePreviewActivity.this, FacePhotoActivity.class);
+                        intent.putExtra(PhotoParams.EXTRA_CARD_PARAMS, new PhotoParams());
+                        startActivityForResult(intent, VerifyHelper.RequestCode.UPLOAD_PHOTO);
+                    }
+                }).setNegativeButton(R.string.moduleverify_string_verify_cancel, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.dismiss();
+            }
+        }).show();
     }
 
     private void setSuccessToResult() {
         final Intent intent = new Intent();
-        intent.putExtra(VerifyConsts.RESULT_VERIFY_STATUS, true);
         setResult(Activity.RESULT_OK, intent);
         finish();
     }
@@ -140,31 +167,10 @@ public final class FacePreviewActivity extends AppCompatActivity implements View
         FaceVerifyActivity.openFaceVerify(this);
     }
 
-    private void bindData() {
-        if (TextUtils.isEmpty(mName)) {
-            mFaceName.setText(String.format("%s\n%s%S", getString(R.string.moduleverify_string_security_verify), getString(R.string.moduleverify_string_security_prove), getString(R.string.moduleverify_string_security_exam)));
-        } else {
-            mFaceName.setText(getStyle());
-        }
-
-        if (!TextUtils.isEmpty(mPreviewPath)) {
-            Glide.with(this).asBitmap().load(mPreviewPath).centerCrop().into(mIvFace);
-        }
-    }
-
-    private SpannableStringBuilder getStyle() {
-        final SpannableStringBuilder style = new SpannableStringBuilder(getString(R.string.moduleverify_string_security_verify));
-        style.append("\n").append(getString(R.string.moduleverify_string_security_prove)).append(mName).append(getString(R.string.moduleverify_string_security_exam));
-        final int nameLength = mName.length();
-        style.setSpan(new ForegroundColorSpan(getResources().getColor(R.color.moduleface_color_yellow_normal)), 12, 12 + nameLength, Spannable.SPAN_EXCLUSIVE_INCLUSIVE);
-        style.setSpan(new AbsoluteSizeSpan(18, true), 12, 12 + nameLength, Spannable.SPAN_EXCLUSIVE_INCLUSIVE);
-        return style;
-    }
-
     private void getExtraData() {
         final Intent intent = getIntent();
-        this.mPreviewPath = intent.getStringExtra(VerifyConsts.EXTRA_PREVIEW_PATH);
-        this.mName = intent.getStringExtra(VerifyConsts.EXTRA_PREVIEW_NAME);
+        this.mPreviewPath = intent.getStringExtra(VerifyHelper.Extra.PHOTO_URL);
+        this.mName = intent.getStringExtra(VerifyHelper.Extra.PHOTO_NAME);
     }
 
     private void onRestoreState() {
@@ -199,7 +205,7 @@ public final class FacePreviewActivity extends AppCompatActivity implements View
         });
     }
 
-    public interface PermissionCallback {
+    private interface PermissionCallback {
 
         void onGranted();
     }

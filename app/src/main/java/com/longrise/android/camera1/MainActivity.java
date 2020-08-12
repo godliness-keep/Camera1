@@ -13,8 +13,8 @@ import com.longrise.android.face.verify.FaceMatchRegistry;
 import com.longrise.android.face.verify.FacePreviewActivity;
 import com.longrise.android.face.verify.FaceVerifyActivity;
 import com.longrise.android.face.verify.FaceVerifyProxy;
-import com.longrise.android.face.verify.verify.CardParams;
-import com.longrise.android.face.verify.verify.FaceCardActivity;
+import com.longrise.android.face.verify.verify.PhotoParams;
+import com.longrise.android.face.verify.FacePhotoActivity;
 
 import java.util.Random;
 
@@ -56,27 +56,17 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        findViewById(R.id.detector).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                final Intent intent = new Intent(MainActivity.this, FaceDetectDemo.class);
-                startActivity(intent);
-
-            }
-        });
-
         findViewById(R.id.upload).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                final Intent intent = new Intent(MainActivity.this, FaceCardActivity.class);
-                final CardParams params = new CardParams();
-                intent.putExtra(CardParams.EXTRA_CARD_PARAMS, params);
+                final Intent intent = new Intent(MainActivity.this, FacePhotoActivity.class);
+                final PhotoParams params = new PhotoParams();
+                params.mTips = "温馨提示：\n①上传的照片用于您本人报名在线考试时的电子证件照；\n② 照片上传后如有问题，请联系客服400-681-8148。";
+                intent.putExtra(PhotoParams.EXTRA_CARD_PARAMS, params);
                 startActivity(intent);
             }
         });
-
     }
-
 
     private FaceMatchRegistry.FaceUploadListener mUploadListener;
     private FaceMatchRegistry.FaceMatchListener mMatchListener;

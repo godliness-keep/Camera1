@@ -14,4 +14,11 @@
     <string name="moduleverify_string_security_snackbar_tips">该操作必须要获取您的相机权限</string>
     <string name="moduleface_upload_card_photo">上传证件照</string>
     <string name="moduleface_string_title_upload">上传照片</string>
+    <string name="moduleface_exchange_card_photo">更换证件照</string>
+    <string name="moduleface_exchange_photo">更换照片</string>
+    <string name="moduleverify_string_face_verify">人脸识别</string>
+    <string name="moduleverify_string_face_not_detected">图片中没有人脸，建议重新上传图片</string>
+    <string name="moduleverify_string_face_size">图片尺寸过大，建议重新上传图片</string>
+    <string name="moduleverify_string_confirm">确定</string>
+    <string name="moduleverify_string_verify_cancel">取消</string>
 </resources>

@@ -11,8 +11,9 @@
             android:screenOrientation="portrait" />
 
         <activity
-            android:name=".verify.FaceCardActivity"
+            android:name=".FacePhotoActivity"
             android:screenOrientation="portrait" />
+
     </application>
 
 </manifest>
