@@ -1,12 +1,11 @@
 <resources>
     <string name="moduleface_string_change_photo">更换证件照</string>
     <string name="moduleface_string_upload_photo">上传证件照</string>
-    <string name="moduleface_string_start_verify">开始识别</string>
     <string name="moduleface_string_verfiy_fail">这里显示识别的状态</string>
     <string name="moduleface_string_reset_take">重新识别</string>
     <string name="moduleface_string_tips2">请将正面对准框内并保持光线充足</string>
     <string name="moduleface_string_face_verify">人脸识别</string>
-    <string name="moduleface_string_start_verify_unline">开始\n识别</string>
+    <string name="moduleface_string_start_verify">开始\n识别</string>
     <string name="moduleface_string_security_verify">通过面部安全识别</string>
     <string name="moduleface_string_security_prove">证明是</string>
     <string name="moduleface_string_security_exam">本人考试</string>

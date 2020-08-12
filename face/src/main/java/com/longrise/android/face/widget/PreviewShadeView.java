@@ -3,6 +3,7 @@ package com.longrise.android.face.widget;
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
@@ -32,6 +33,10 @@ public final class PreviewShadeView extends FrameLayout {
     private Bitmap mEraserBitmap;
     private Canvas mEraserCanvas;
     private Paint mEraserPaint;
+
+    private Bitmap mCompassBitmap;
+    private float mCompassX;
+    private float mCompassY;
 
     private final Context mCxt;
 
@@ -68,6 +73,7 @@ public final class PreviewShadeView extends FrameLayout {
         mEraserCanvas.drawColor(mBackgroundColor);
         mEraserCanvas.drawCircle(mRadiusX, mRadiusY, mRadius, createIfPaint());
         canvas.drawBitmap(mEraserBitmap, 0, 0, null);
+        canvas.drawBitmap(mCompassBitmap, mCompassX, mCompassY, null);
     }
 
     private void initSize(int width, int height) {
@@ -86,7 +92,7 @@ public final class PreviewShadeView extends FrameLayout {
         } else {
             mRadiusX = dip2px(scale, mRadiusX);
         }
-        if (mOffsetY <= 0F) {
+        if (mOffsetY <= 0) {
             mOffsetY = mRadius / 2;
         } else {
             mOffsetY = dip2px(scale, mOffsetY);
@@ -103,11 +109,22 @@ public final class PreviewShadeView extends FrameLayout {
         }
 
         createEraserBitmap(width, height);
+        initCompassSize(scale);
+    }
+
+    private void initCompassSize(float scale) {
+        createCompassBitmap();
+        mCompassX = mRadiusX - (float) mCompassBitmap.getWidth() / 2;
+        mCompassY = mRadiusY - (float) mCompassBitmap.getHeight() / 2 + 30 ;
     }
 
     private void createEraserBitmap(int x, int y) {
         mEraserBitmap = Bitmap.createBitmap(x, y, Bitmap.Config.ARGB_8888);
         mEraserCanvas = new Canvas(mEraserBitmap);
+    }
+
+    private void createCompassBitmap() {
+        mCompassBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.moduleface_circle_bg_compass);
     }
 
     private Paint createIfPaint() {
