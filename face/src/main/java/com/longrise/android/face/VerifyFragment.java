@@ -40,7 +40,7 @@ public final class VerifyFragment extends BaseFragment<VerifyFragment.Builder> i
 
     @Override
     public void setAutoFocus() {
-
+        // do nothing
     }
 
     @Override
