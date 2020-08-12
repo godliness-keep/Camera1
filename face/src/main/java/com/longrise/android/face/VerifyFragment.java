@@ -177,7 +177,7 @@ public final class VerifyFragment extends BaseFragment<VerifyFragment.Builder> i
             } else {
                 removeTips();
                 mTips.setText(msg);
-                mTips.setBackground(getResources().getDrawable(R.drawable.moduleface_shape_verify_fail));
+                mTips.setBackground(getResources().getDrawable(R.drawable.moduleface_shape_verify_bg_notice));
                 mTips.postDelayed(getTipRunnable(), VerifyProxy.TIP_TIME_OUT);
             }
         }
