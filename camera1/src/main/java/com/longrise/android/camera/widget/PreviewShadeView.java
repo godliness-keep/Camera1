@@ -32,6 +32,8 @@ public final class PreviewShadeView extends FrameLayout {
     private float mRadius;
     private float mRadiusX;
     private float mRadiusY;
+    private float mCircleX;
+    private float mCircleY;
     private float mOffsetY;
 
     private Bitmap mEraserBitmap;
@@ -54,6 +56,8 @@ public final class PreviewShadeView extends FrameLayout {
         this.mRadius = ta.getDimension(R.styleable.PreviewShadeView_shade_radius, 0);
         this.mRadiusX = ta.getDimension(R.styleable.PreviewShadeView_shade_x, 0);
         this.mRadiusY = ta.getDimension(R.styleable.PreviewShadeView_shade_y, 0);
+        this.mCircleX = ta.getDimension(R.styleable.PreviewShadeView_circle_x, 0);
+        this.mCircleY = ta.getDimension(R.styleable.PreviewShadeView_circle_y, 0);
         this.mOffsetY = ta.getDimension(R.styleable.PreviewShadeView_shade_offsetY, 0F);
         ta.recycle();
         setWillNotDraw(false);
@@ -73,14 +77,16 @@ public final class PreviewShadeView extends FrameLayout {
         mEraserCanvas.drawColor(mBackgroundColor);
         mEraserCanvas.drawCircle(mRadiusX, mRadiusY, mRadius, createIfPaint());
         canvas.drawBitmap(mEraserBitmap, 0, 0, null);
-        canvas.drawBitmap(mCircleBitmap, mRadiusX-mCircleBitmap.getWidth()/2,
-                mRadiusY-mCircleBitmap.getHeight()/2+DpUtil.dip2px(mCxt,10), null);
+        canvas.drawBitmap(mCircleBitmap, mCircleX, mCircleY, null);
     }
 
     private void initSize(int width, int height) {
 //        final int x = cxt.getResources().getDisplayMetrics().widthPixels;
 //        final int y = cxt.getResources().getDisplayMetrics().heightPixels;
         final Context cxt = mCxt;
+
+        //提前创建 计算绘制位置需要
+        createCircleBitmap();
 
         if (mRadius <= 0) {
             mRadius = width / 3;
@@ -91,12 +97,12 @@ public final class PreviewShadeView extends FrameLayout {
         if (mRadiusX <= 0) {
             mRadiusX = width / 2;
         } else {
-            mRadiusX = DpUtil.dip2px(cxt,mRadiusX);
+            mRadiusX = DpUtil.dip2px(cxt, mRadiusX);
         }
         if (mOffsetY <= 0F) {
             mOffsetY = mRadius / 2;
         } else {
-            mOffsetY = DpUtil.dip2px(cxt,mOffsetY);
+            mOffsetY = DpUtil.dip2px(cxt, mOffsetY);
         }
 
         if (mRadiusY <= 0) {
@@ -105,24 +111,39 @@ public final class PreviewShadeView extends FrameLayout {
             mRadiusY = DpUtil.dip2px(cxt, mRadiusY);
         }
 
+        if (mCircleX <= 0) {
+            if (mCircleBitmap!=null) {
+                int bitmapHalfX = mCircleBitmap.getWidth() / 2;
+                mCircleX = mRadiusX - bitmapHalfX;
+            }
+        } else {
+            mCircleX = DpUtil.dip2px(cxt, mRadiusY);
+        }
+
+        if (mCircleY <= 0) {
+            if (mCircleBitmap!=null) {
+                int bitmapHalfY = mCircleBitmap.getHeight() / 2;
+                mCircleY = mRadiusY - bitmapHalfY + DpUtil.dip2px(mCxt, 10);
+            }
+        } else {
+            mCircleY = DpUtil.dip2px(cxt, mRadiusY);
+        }
+
         if (mBackgroundColor <= 0) {
             mBackgroundColor = Color.parseColor("#55FFFFFF");
         }
 
         createEraserBitmap(width, height);
-        createCircleBitmap();
     }
 
     private void createEraserBitmap(int x, int y) {
         mEraserBitmap = Bitmap.createBitmap(x, y, Bitmap.Config.ARGB_8888);
-        mCircleBitmap = BitmapFactory.decodeResource(getContext().getResources()
-                ,R.drawable.moduleface_circle_bg_round);
         mEraserCanvas = new Canvas(mEraserBitmap);
     }
 
     private void createCircleBitmap() {
         mCircleBitmap = BitmapFactory.decodeResource(getContext().getResources()
-                ,R.drawable.moduleface_circle_bg_round);
+                , R.drawable.moduleface_circle_bg_round);
     }
 
     private Paint createIfPaint() {

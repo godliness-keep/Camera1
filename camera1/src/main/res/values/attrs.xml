@@ -6,6 +6,8 @@
         <attr name="shade_background" format="color" />
         <attr name="shade_x" format="dimension" />
         <attr name="shade_y" format="dimension" />
+        <attr name="circle_x" format="dimension" />
+        <attr name="circle_y" format="dimension" />
         <attr name="shade_offsetY" format="dimension" />
     </declare-styleable>
 
