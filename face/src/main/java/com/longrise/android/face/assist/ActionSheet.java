@@ -69,6 +69,7 @@ public final class ActionSheet extends DialogFragment implements View.OnClickLis
     public Dialog onCreateDialog(@Nullable Bundle savedInstanceState) {
         final Dialog dialog = super.onCreateDialog(savedInstanceState);
         final Window window = dialog.getWindow();
+        window.requestFeature(Window.FEATURE_NO_TITLE);
         final WindowManager.LayoutParams lp = window.getAttributes();
         lp.width = WindowManager.LayoutParams.MATCH_PARENT;
         lp.height = WindowManager.LayoutParams.WRAP_CONTENT;

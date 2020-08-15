@@ -1,6 +1,5 @@
 package com.longrise.android.face;
 
-import android.content.Context;
 import android.hardware.Camera;
 import android.os.Bundle;
 import android.support.annotation.StringRes;
@@ -19,7 +18,6 @@ import com.longrise.android.camera.PreviewStatusListener;
 import com.longrise.android.face.base.BaseBuilder;
 import com.longrise.android.face.base.BaseFragment;
 import com.longrise.android.face.listeners.FaceInterceptListener;
-import com.longrise.android.face.utils.DpUtil;
 import com.longrise.android.face.utils.Tips;
 import com.longrise.android.face.widget.WheelView;
 
@@ -115,9 +113,6 @@ public final class VerifyFragment extends BaseFragment<VerifyFragment.Builder> i
     @Override
     protected void configBuilder(Builder builder) {
         this.mBuilder = builder;
-        if (builder.mTranslucentStatus) {
-            adjustTipsLocation();
-        }
         configPreview(builder);
     }
 
@@ -201,16 +196,6 @@ public final class VerifyFragment extends BaseFragment<VerifyFragment.Builder> i
         return mTipRunnable;
     }
 
-    private void adjustTipsLocation() {
-        final Context cxt = getContext();
-        if (cxt != null) {
-            final int lr = DpUtil.dip2px(getContext(), 16);
-            final int bottom = lr / 2;
-            final int topPadding = bottom + DpUtil.getStatusBarHeight(getContext());
-            mTips.setPadding(lr, topPadding, lr, bottom);
-        }
-    }
-
     private void resetTakePicture(boolean show, @StringRes int resid) {
         if (mTakePicture != null) {
             mTakePicture.setVisibility(show ? View.VISIBLE : View.GONE);
@@ -226,7 +211,6 @@ public final class VerifyFragment extends BaseFragment<VerifyFragment.Builder> i
 
     public static final class Builder extends BaseBuilder<VerifyProxy> {
 
-        boolean mTranslucentStatus;
         Camera.ShutterCallback mShutterCallback;
         Camera.PictureCallback mRawCallback;
         JpegCallback mTakeCallback;
@@ -272,11 +256,6 @@ public final class VerifyFragment extends BaseFragment<VerifyFragment.Builder> i
 
         public Builder takeInterceptListener(FaceInterceptListener interceptListener) {
             this.mInterceptListener = interceptListener;
-            return this;
-        }
-
-        public Builder translucentStatus() {
-            this.mTranslucentStatus = true;
             return this;
         }
 

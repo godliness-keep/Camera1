@@ -1,8 +1,10 @@
 package com.longrise.android.camera1;
 
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
+import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
@@ -10,11 +12,11 @@ import android.util.Log;
 import android.view.View;
 
 import com.longrise.android.face.verify.FaceMatchRegistry;
+import com.longrise.android.face.verify.FacePhotoActivity;
 import com.longrise.android.face.verify.FacePreviewActivity;
 import com.longrise.android.face.verify.FaceVerifyActivity;
 import com.longrise.android.face.verify.FaceVerifyProxy;
 import com.longrise.android.face.verify.verify.PhotoParams;
-import com.longrise.android.face.verify.FacePhotoActivity;
 
 import java.util.Random;
 
@@ -25,6 +27,19 @@ public class MainActivity extends AppCompatActivity {
 
     private static final String PREVIEW_PATH = "https://wuhan.yxybb.com/BBV6/LEAP/Download/headimage/2019/10/28/92039a946f094544abd5eec115c2e678.jpg";
 
+    public boolean isDateTimeAuto() {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.JELLY_BEAN_MR1) {
+            return true;
+        }
+        try {
+            return Settings.Global.getInt(getContentResolver(),
+                    android.provider.Settings.Global.AUTO_TIME) > 0;
+        } catch (Settings.SettingNotFoundException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -33,7 +48,6 @@ public class MainActivity extends AppCompatActivity {
         findViewById(R.id.face_verify).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                // 如果直接需要面部识别
                 FaceVerifyActivity.openFaceVerify(MainActivity.this);
                 registerListener();
             }
@@ -149,4 +163,5 @@ public class MainActivity extends AppCompatActivity {
             values[currentIndex] = values[size - i];
         }
     }
+
 }

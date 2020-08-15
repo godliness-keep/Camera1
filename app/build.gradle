@@ -9,6 +9,10 @@ android {
         targetSdkVersion 28
         versionCode 1
         versionName "1.0"
+
+        ndk {
+            abiFilters 'armeabi-v7a'
+        }
     }
     buildTypes {
         release {
@@ -25,10 +29,4 @@ dependencies {
 
     // 面部识别，算不上业务公共了
     implementation project(':face-verify')
-    // 相机预览基础库
-    implementation project(':camera1')
-    // 人脸检测
-    implementation project(':face-detector')
-
-
 }

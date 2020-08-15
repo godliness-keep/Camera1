@@ -17,7 +17,6 @@ import android.widget.TextView;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.target.SimpleTarget;
 import com.bumptech.glide.request.transition.Transition;
-import com.longrise.android.face.assist.FaceHelper;
 import com.longrise.android.face.base.BaseBuilder;
 import com.longrise.android.face.base.BaseFragment;
 import com.longrise.android.face.params.PhotoParams;
@@ -43,6 +42,11 @@ public final class PreviewFragment extends BaseFragment<PreviewFragment.Builder>
     private DetectLevel mDetectLevel;
 
     /**
+     * 当前图片是否已经检查过
+     */
+    private boolean mAlreadyVerify;
+
+    /**
      * 重新预览
      *
      * @param url 新的图片地址
@@ -50,6 +54,7 @@ public final class PreviewFragment extends BaseFragment<PreviewFragment.Builder>
     @Override
     public void restartPreview(String url) {
         if (!isDetached()) {
+            mParams.previewUrl(url);
             loadPreviewPhoto(url);
         }
     }
@@ -64,7 +69,7 @@ public final class PreviewFragment extends BaseFragment<PreviewFragment.Builder>
         /**
          * 图片分辨率过大
          */
-        void onMoreThanSize(int srcWidth, int srcHeight);
+        void onBeyondSize(int srcWidth, int srcHeight);
 
         /**
          * 去人脸识别
@@ -117,36 +122,35 @@ public final class PreviewFragment extends BaseFragment<PreviewFragment.Builder>
         regEvent(false);
     }
 
-    private FaceDetect.Finder mFinder;
-
-    private FaceDetect.Finder getFinder(final Bitmap face) {
-        if (mFinder == null) {
-            mFinder = new FaceDetect.Finder(face) {
-                @Override
-                public void detected(Face[] faces, boolean hasFace) {
-                    if (!hasFace) {
-                        faceDetectFailed();
+    private FaceDetect.Finder detectFace(final Bitmap face) {
+        return new FaceDetect.Finder(face) {
+            @Override
+            public void onDetected(Face[] faces, boolean hasFace) {
+                if (!hasFace) {
+                    faceDetectFailed();
+                    return;
+                }
+                if (mDetectLevel == DetectLevel.ALL) {
+                    final int srcWidth = face.getWidth();
+                    final int srcHeight = face.getHeight();
+                    if (srcWidth > mParams.photoMaxWidth() || srcHeight > mParams.photoMaxHeight()) {
+                        onMoreThanSize(srcWidth, srcHeight);
                         return;
                     }
-
-                    if (mDetectLevel == DetectLevel.ALL) {
-                        final int srcWidth = face.getWidth();
-                        final int srcHeight = face.getHeight();
-                        if (srcWidth > FaceHelper.ASPECT_X || srcHeight > FaceHelper.ASPECT_Y) {
-                            onMoreThanSize(srcWidth, srcHeight);
-                            return;
-                        }
-                    }
-                    toVerify();
                 }
-            };
-        }
-        return mFinder;
+                toVerify();
+            }
+        };
     }
 
     private void startFaceDetect() {
+        if (mAlreadyVerify) {
+            toVerify();
+            return;
+        }
         if (mDetectLevel == DetectLevel.ALL || mDetectLevel == DetectLevel.FACE) {
-            FaceHelper.findFaces(getFinder(mPhoto.getImageBitmap()));
+            final Bitmap face = mPhoto.getImageBitmap();
+            detectFace(face).detect();
         } else {
             toVerify();
         }
@@ -156,6 +160,7 @@ public final class PreviewFragment extends BaseFragment<PreviewFragment.Builder>
         if (mFacePreviewListener != null) {
             mFacePreviewListener.toVerify();
         }
+        mAlreadyVerify = true;
     }
 
     private void faceDetectFailed() {
@@ -166,7 +171,7 @@ public final class PreviewFragment extends BaseFragment<PreviewFragment.Builder>
 
     private void onMoreThanSize(int srcWidth, int srcHeight) {
         if (mFacePreviewListener != null) {
-            mFacePreviewListener.onMoreThanSize(srcWidth, srcHeight);
+            mFacePreviewListener.onBeyondSize(srcWidth, srcHeight);
         }
     }
 
@@ -215,6 +220,7 @@ public final class PreviewFragment extends BaseFragment<PreviewFragment.Builder>
                     public void onResourceReady(@NonNull Bitmap resource, @Nullable Transition<? super Bitmap> transition) {
                         if (!isDetached()) {
                             mPhoto.setImageBitmap(resource);
+                            mAlreadyVerify = false;
                             changeVerifyState(R.drawable.moduleface_selector_start_verify_circle, true);
                         }
                     }
@@ -234,13 +240,24 @@ public final class PreviewFragment extends BaseFragment<PreviewFragment.Builder>
 
     public enum DetectLevel {
 
-        ALL, FACE, NONE
+        /**
+         * 检查是否含有人脸和尺寸
+         */
+        ALL,
+        /**
+         * 仅检查人脸
+         */
+        FACE,
+        /**
+         * do nothing
+         */
+        NONE
     }
 
     public static final class Builder extends BaseBuilder<PreviewProxy> {
 
         OnFacePreviewListener mPreviewListener;
-        DetectLevel mDetectLevel = DetectLevel.NONE;
+        DetectLevel mDetectLevel = DetectLevel.ALL;
         private String mName;
         private String mPreviewUrl;
 

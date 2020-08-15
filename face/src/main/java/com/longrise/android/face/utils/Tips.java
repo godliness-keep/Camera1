@@ -38,10 +38,6 @@ public final class Tips {
         showTips(host, host.getString(msgId));
     }
 
-    public static com.longrise.android.image.crop.tips.Tips showTipDialog(AppCompatActivity host, String msg) {
-        return com.longrise.android.image.crop.tips.Tips.show(host, msg);
-    }
-
     public static void log(String tag, String msg) {
         if (BuildConfig.DEBUG) {
             Log.e(tag, msg);

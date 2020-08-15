@@ -8,7 +8,7 @@ android {
         targetSdkVersion 28
         versionCode 1
         versionName "1.0"
-
+        resConfigs "zh"
     }
 
     buildTypes {
@@ -20,10 +20,10 @@ android {
 }
 
 dependencies {
-    implementation fileTree(dir: 'libs', include: ['*.jar', '*.aar'])
     implementation 'com.android.support:appcompat-v7:28.0.0'
     implementation 'com.github.bumptech.glide:glide:4.9.0'
 
-    implementation project(':camera1')
-    implementation project(':face-detector')
+    api files('libs/camera1-1.0.0.aar')
+    implementation files('libs/face-detector-1.0.0.aar')
+    implementation files('libs/image-crop-1.0.0.aar')
 }

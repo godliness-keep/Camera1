@@ -27,7 +27,7 @@
             android:layout_height="wrap_content"
             android:paddingRight="11dp"
             android:scaleType="centerCrop"
-            android:src="@drawable/moduleface_round_face_bg" />
+            android:src="@drawable/moduleface_bg_round_face" />
 
         <com.longrise.android.face.widget.RoundImageView
             android:id="@+id/round_iv_face"

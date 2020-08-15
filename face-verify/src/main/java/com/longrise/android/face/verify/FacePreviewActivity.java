@@ -9,7 +9,6 @@ import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
@@ -19,6 +18,7 @@ import android.view.Window;
 
 import com.longrise.android.face.PreviewFragment;
 import com.longrise.android.face.PreviewProxy;
+import com.longrise.android.face.utils.Tips;
 import com.longrise.android.face.verify.assist.VerifyHelper;
 import com.longrise.android.face.verify.verify.PhotoParams;
 
@@ -128,7 +128,7 @@ public final class FacePreviewActivity extends AppCompatActivity implements View
         }
 
         @Override
-        public void onMoreThanSize(int srcWidth, int srcHeight) {
+        public void onBeyondSize(int srcWidth, int srcHeight) {
             toReUploadPhoto(getString(R.string.moduleverify_string_face_size));
         }
 
@@ -187,13 +187,14 @@ public final class FacePreviewActivity extends AppCompatActivity implements View
 
     private void showRequestPermissionRationale() {
         final Window window = getWindow();
-        Snackbar.make(window.getDecorView(), getString(R.string.moduleverify_string_security_snackbar_tips), Snackbar.LENGTH_INDEFINITE)
-                .setAction(getString(R.string.moduleverify_string_security_dialog_confirm), new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        ActivityCompat.requestPermissions(FacePreviewActivity.this, new String[]{Manifest.permission.CAMERA}, REQUEST_CAMERA_PERMISSION);
-                    }
-                }).show();
+        Tips.showTips(this, getString(R.string.moduleverify_string_security_snackbar_tips));
+//        Snackbar.make(window.getDecorView(), getString(R.string.moduleverify_string_security_snackbar_tips), Snackbar.LENGTH_INDEFINITE)
+//                .setAction(getString(R.string.moduleverify_string_security_dialog_confirm), new View.OnClickListener() {
+//                    @Override
+//                    public void onClick(View v) {
+//                        ActivityCompat.requestPermissions(FacePreviewActivity.this, new String[]{Manifest.permission.CAMERA}, REQUEST_CAMERA_PERMISSION);
+//                    }
+//                }).show();
     }
 
     private void beforeStartVerify() {

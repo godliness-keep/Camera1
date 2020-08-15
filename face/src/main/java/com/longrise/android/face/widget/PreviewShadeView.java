@@ -12,6 +12,7 @@ import android.graphics.PorterDuffXfermode;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.widget.FrameLayout;
 
 import com.longrise.android.face.R;
@@ -105,17 +106,18 @@ public final class PreviewShadeView extends FrameLayout {
         }
 
         if (mBackgroundColor <= 0) {
-            mBackgroundColor = Color.parseColor("#55FFFFFF");
+            mBackgroundColor = getResources().getColor(R.color.moduleface_color_white_alpha_55);
         }
 
         createEraserBitmap(width, height);
         initCompassSize(scale);
+        Log.e("mOffsetY", "mOffsetY: " + mOffsetY);
     }
 
     private void initCompassSize(float scale) {
         createCompassBitmap();
         mCompassX = mRadiusX - (float) mCompassBitmap.getWidth() / 2;
-        mCompassY = mRadiusY - (float) mCompassBitmap.getHeight() / 2 + 30 ;
+        mCompassY = mRadiusY - (float) mCompassBitmap.getHeight() / 2 + dip2px(scale, 10);
     }
 
     private void createEraserBitmap(int x, int y) {
@@ -124,13 +126,13 @@ public final class PreviewShadeView extends FrameLayout {
     }
 
     private void createCompassBitmap() {
-        mCompassBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.moduleface_circle_bg_compass);
+        mCompassBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.moduleface_bg_circle_compass);
     }
 
     private Paint createIfPaint() {
         if (mEraserPaint == null) {
             mEraserPaint = new Paint();
-            mEraserPaint.setColor(0XFFFFFFFF);
+            mEraserPaint.setColor(getResources().getColor(android.R.color.white));
             mEraserPaint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.CLEAR));
             mEraserPaint.setFlags(Paint.ANTI_ALIAS_FLAG);
         }

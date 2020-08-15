@@ -4,9 +4,7 @@ import android.graphics.Bitmap;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
-import android.util.Log;
 
-import org.opencv.BuildConfig;
 import org.opencv.android.Utils;
 import org.opencv.core.MatOfRect;
 
@@ -20,8 +18,8 @@ import java.util.concurrent.TimeUnit;
  * Created by godliness on 2020-08-03.
  *
  * @author godliness
- * https://github.com/ShiqiYu/libfacedetection
- * https://github.com/onlyloveyd/Android-FaceDetection
+ * GitHub: https://github.com/ShiqiYu/libfacedetection
+ * GitHub: https://github.com/onlyloveyd/Android-FaceDetection
  * 人脸检测
  */
 public final class FaceDetect implements Handler.Callback {
@@ -34,13 +32,10 @@ public final class FaceDetect implements Handler.Callback {
     private final ExecutorService mExecutor;
     private final LinkedBlockingQueue<Runnable> mQueue;
 
-    interface FaceDetectListener {
-
-        void detected(Face[] faces, boolean hasFace);
-    }
-
-    static {
-        System.loadLibrary("facedetection");
+    @Override
+    public boolean handleMessage(Message msg) {
+        destroy();
+        return true;
     }
 
     public static abstract class Finder implements FaceDetectListener {
@@ -51,28 +46,34 @@ public final class FaceDetect implements Handler.Callback {
             this.mSrc = src;
         }
 
+        public abstract void onDetected(Face[] faces, boolean hasFace);
+
+        @Override
+        public final void detect() {
+            FaceDetect.create().findFaces(this);
+        }
+
         Bitmap getSrc() {
             return mSrc;
         }
     }
 
-    public static void init() {
-        // do nothing
+    interface FaceDetectListener {
+
+        void detect();
     }
 
-    public static FaceDetect create() {
+    static {
+        System.loadLibrary("facedetection");
+    }
+
+    static FaceDetect create() {
         return createIfDetect();
     }
 
-    public void findFaces(Finder finder) {
+    void findFaces(Finder finder) {
         mHandler.removeMessages(MSG_DIE_SELF);
         mExecutor.submit(new Entry(finder, this));
-    }
-
-    @Override
-    public boolean handleMessage(Message msg) {
-        destroy();
-        return true;
     }
 
     void notify(Runnable notify) {
@@ -86,9 +87,6 @@ public final class FaceDetect implements Handler.Callback {
         mExecutor.shutdown();
         mHandler.removeCallbacksAndMessages(null);
         sDetect = null;
-        if (BuildConfig.DEBUG) {
-            Log.e("FaceDetect", "destroy");
-        }
     }
 
     private void startSelfDestruct() {
@@ -112,7 +110,7 @@ public final class FaceDetect implements Handler.Callback {
                 @Override
                 public void run() {
                     // In ui thread
-                    mFinder.detected(faces, faces != null && faces.length > 0);
+                    mFinder.onDetected(faces, faces != null && faces.length > 0);
                 }
             });
         }
@@ -132,15 +130,13 @@ public final class FaceDetect implements Handler.Callback {
     private FaceDetect() {
         this.mHandler = new Handler(Looper.getMainLooper(), this);
         this.mQueue = new LinkedBlockingQueue<>();
-        this.mExecutor = new ThreadPoolExecutor(1, 3, 30, TimeUnit.SECONDS, mQueue, mFactory);
+        this.mExecutor = new ThreadPoolExecutor(1, 3, 30, TimeUnit.SECONDS, mQueue, new ThreadFactory() {
+            @Override
+            public Thread newThread(Runnable r) {
+                return new Thread(r, "face-detect");
+            }
+        });
     }
-
-    private final ThreadFactory mFactory = new ThreadFactory() {
-        @Override
-        public Thread newThread(Runnable r) {
-            return new Thread(r, "face-detect");
-        }
-    };
 
     private Face[] findFaces(Bitmap src) {
         final MatOfRect matOfRect = new MatOfRect();

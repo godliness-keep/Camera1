@@ -3,43 +3,6 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:ellipsize="end"
-        android:gravity="center"
-        android:maxLines="1"
-        android:padding="16dp"
-        android:text="这里用户提示信息"
-        android:background="@drawable/moduleface_shape_verify_bg_notice"
-        android:textColor="@android:color/white"
-        android:textSize="16sp" />
-
-    <TextView
-        android:id="@+id/tv_verify_tips"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="bottom|center_horizontal"
-        android:layout_marginBottom="192dp"
-        android:marginLeft="16dp"
-        android:marginRight="16dp"
-        android:maxLines="1"
-        android:padding="8dp"
-        android:textColor="@android:color/white"
-        android:textSize="12sp" />
-
-    <TextView
-        android:id="@+id/tv_take_picture"
-        android:layout_width="64dp"
-        android:layout_height="64dp"
-        android:layout_gravity="bottom|center_horizontal"
-        android:layout_marginBottom="64dp"
-        android:background="@drawable/moduleface_selector_start_verify_circle"
-        android:gravity="center"
-        android:text="@string/moduleface_string_start_verify"
-        android:textColor="@android:color/white"
-        android:textSize="14sp" />
-
     <com.longrise.android.camera.CameraPreview
         android:id="@+id/camera_preview"
         android:layout_width="match_parent"
@@ -53,5 +16,33 @@
         android:id="@+id/wheel_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
+
+    <TextView
+        android:id="@+id/tv_verify_tips"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginLeft="16dp"
+        android:layout_marginTop="48dp"
+        android:layout_marginRight="16dp"
+        android:maxLines="1"
+        android:paddingLeft="12dp"
+        android:paddingTop="6dp"
+        android:paddingRight="12dp"
+        android:paddingBottom="6dp"
+        android:textColor="@android:color/white"
+        android:textSize="14sp" />
+
+    <TextView
+        android:id="@+id/tv_take_picture"
+        android:layout_width="64dp"
+        android:layout_height="64dp"
+        android:layout_gravity="bottom|center_horizontal"
+        android:layout_marginBottom="64dp"
+        android:background="@drawable/moduleface_selector_start_verify_circle"
+        android:gravity="center"
+        android:text="@string/moduleface_string_start_verify"
+        android:textColor="@android:color/white"
+        android:textSize="14sp" />
 
 </FrameLayout>

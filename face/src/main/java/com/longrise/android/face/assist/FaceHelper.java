@@ -19,9 +19,6 @@ import com.longrise.android.face.common.FaceConsts;
 import com.longrise.android.face.utils.FileUtil;
 import com.longrise.android.image.crop.Crop;
 
-import org.dp.facedetection.Face;
-import org.dp.facedetection.FaceDetect;
-
 import java.io.File;
 
 /**
@@ -41,6 +38,9 @@ public final class FaceHelper {
      */
     public static final int ASPECT_X = 411;
     public static final int ASPECT_Y = 548;
+
+    public static final int MAX_FACE_WIDTH = ASPECT_X * 2;
+    public static final int MAX_FACE_HEIGHT = ASPECT_Y * 2;
 
     /**
      * 开启画廊
@@ -113,7 +113,6 @@ public final class FaceHelper {
     public static Uri getCropResult(int resultCode, Intent result) {
         if (resultCode == Activity.RESULT_OK) {
             return Crop.getOutput(result);
-        } else if (resultCode == Crop.RESULT_ERROR) {
         }
         return null;
     }
@@ -143,49 +142,6 @@ public final class FaceHelper {
         options.inPreferredConfig = Bitmap.Config.RGB_565;
         return BitmapFactory.decodeFile(uri.getPath(), options);
     }
-
-    public static void findFaces(FaceDetect.Finder finder) {
-        FaceDetect.create().findFaces(finder);
-    }
-
-//    public static Bitmap foundFaces(@NonNull Bitmap src) {
-//        FaceDetect.create().findFaces(new FaceDetect.Finder(src) {
-//            @Override
-//            public void detected(Face[] faces) {
-//
-//            }
-//        });
-//        final FaceDetect detect = new FaceDetect();
-//        final Face[] faces = detect.findFaces(src);
-//        if (faces != null && faces.length > 0) {
-//            return src;
-//        }
-//        return null;
-//    }
-
-//    public static Bitmap foundFaces(@NonNull Uri uri) {
-//        return foundFaces(uri, 1);
-//    }
-//
-//    public static Bitmap foundFaces(@NonNull Uri uri, int maxFaces) {
-//        final BitmapFactory.Options options = new BitmapFactory.Options();
-//        options.inPreferredConfig = Bitmap.Config.RGB_565;
-//        final Bitmap src = BitmapFactory.decodeFile(uri.getPath(), options);
-//        return foundFaces(src);
-//    }
-
-//    public static Bitmap foundFaces(@NonNull Uri uri, int maxFaces) {
-//        final BitmapFactory.Options options = new BitmapFactory.Options();
-//        options.inPreferredConfig = Bitmap.Config.RGB_565;
-//        final Bitmap bitmap = BitmapFactory.decodeFile(uri.getPath(), options);
-//        final int width = bitmap.getWidth();
-//        final int height = bitmap.getHeight();
-//        final FaceDetector detector = new FaceDetector(width, height, maxFaces);
-//        if (detector.findFaces(bitmap, new FaceDetector.Face[maxFaces]) > 0) {
-//            return bitmap;
-//        }
-//        return null;
-//    }
 
     public static Bitmap get2InchesPhoto(@NonNull Bitmap src) {
         return getFixedSizePhoto(src, FaceHelper.ASPECT_X, FaceHelper.ASPECT_Y);

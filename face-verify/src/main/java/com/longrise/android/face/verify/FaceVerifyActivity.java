@@ -59,7 +59,7 @@ public final class FaceVerifyActivity extends AppCompatActivity implements View.
             onRestoreState();
         }
         setContentView(R.layout.moduleverify_activity_face_verify);
-//        initBackView();
+        initBackView();
 
         // 创建面部识别代理
         mProxy = new VerifyFragment.Builder(this)
@@ -68,7 +68,6 @@ public final class FaceVerifyActivity extends AppCompatActivity implements View.
                 .pictureCallback(null, null, mJpegCallback)
                 .takeInterceptListener(mInterceptListener)
                 .faceDetectionListener(mFaceDetectionListener)
-                .translucentStatus()
                 .commitAndSaveState(savedInstanceState, R.id.verify_content);
 
         // 创建识别代理，监听上传服务与匹配过程
@@ -87,6 +86,8 @@ public final class FaceVerifyActivity extends AppCompatActivity implements View.
         }
         removeDelayResult();
         super.onDestroy();
+        // 卸载
+        FaceMatchRegistry.unRegistry();
     }
 
     private void createVerifyProxy() {
@@ -215,7 +216,7 @@ public final class FaceVerifyActivity extends AppCompatActivity implements View.
         final View back = findViewById(R.id.iv_back);
         back.setOnClickListener(this);
         final FrameLayout.LayoutParams lp = (FrameLayout.LayoutParams) back.getLayoutParams();
-        lp.topMargin = DpUtil.getStatusBarHeight(this) / 2;
+        lp.topMargin = DpUtil.getStatusBarHeight(this);
     }
 
     /**

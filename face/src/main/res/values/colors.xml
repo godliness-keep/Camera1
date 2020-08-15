@@ -2,5 +2,7 @@
 <resources>
     <color name="moduleface_color_yellow_press">#F29100</color>
     <color name="moduleface_color_yellow_normal">#FF9900</color>
-    <color name="moduleface_color_white_press">#fffbf0</color>
+    <color name="moduleface_color_white_press">#F2F2F2</color>
+
+    <color name="moduleface_color_white_alpha_55">#55FFFFFF</color>
 </resources>

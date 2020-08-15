@@ -14,7 +14,6 @@ import com.bumptech.glide.Glide;
 import com.longrise.android.face.assist.FaceHelper;
 import com.longrise.android.face.base.BaseBuilder;
 import com.longrise.android.face.base.BaseFragment;
-import com.longrise.android.face.base.IProxy;
 import com.longrise.android.face.common.FaceConsts;
 import com.longrise.android.face.params.PhotoParams;
 import com.longrise.android.face.utils.Tips;
@@ -29,7 +28,7 @@ import org.dp.facedetection.FaceDetect;
  *
  * @author godliness
  */
-public final class PhotoFragment extends BaseFragment<PhotoFragment.Builder> implements IProxy, View.OnClickListener {
+public final class PhotoFragment extends BaseFragment<PhotoFragment.Builder> implements PhotoProxy, View.OnClickListener {
 
     private static final String TAG = "PhotoFragment";
 
@@ -53,6 +52,34 @@ public final class PhotoFragment extends BaseFragment<PhotoFragment.Builder> imp
          * @param newBitmap 新的图片
          */
         void toVerify(@NonNull Bitmap newBitmap);
+    }
+
+    /**
+     * 获取当前照片
+     */
+    @Override
+    public Bitmap getCurrentPhoto() {
+        return mPhoto.getImageBitmap();
+    }
+
+    /**
+     * 修改提交按钮文字
+     */
+    @Override
+    public void changeCommitStatus(int strId) {
+        if (mCommit != null) {
+            mCommit.setText(strId);
+        }
+    }
+
+    /**
+     * 控制提交按钮显示状态
+     */
+    @Override
+    public void changeCommitVisible(boolean visible) {
+        if (mCommit != null) {
+            mCommit.setVisibility(visible ? View.VISIBLE : View.GONE);
+        }
     }
 
     @Override
@@ -144,18 +171,22 @@ public final class PhotoFragment extends BaseFragment<PhotoFragment.Builder> imp
             Tips.showTips(this, R.string.moduleface_string_not_found_crop);
             return;
         }
-
         final Bitmap face = FaceHelper.faceUriToBitmap(cropUri);
-        FaceHelper.findFaces(new FaceDetect.Finder(face) {
+        detectFace(face);
+    }
+
+    private void detectFace(final Bitmap face) {
+        final FaceDetect.Finder faceFinder = new FaceDetect.Finder(face) {
             @Override
-            public void detected(Face[] faces, boolean hasFace) {
+            public void onDetected(Face[] faces, boolean hasFace) {
                 if (!hasFace) {
                     Tips.showTips(PhotoFragment.this, R.string.moduleface_string_not_detect_face);
                 } else {
                     updatePhoto(FaceHelper.get2InchesPhoto(face));
                 }
             }
-        });
+        };
+        faceFinder.detect();
     }
 
     private void handleCamera(int resultCode) {
@@ -220,7 +251,7 @@ public final class PhotoFragment extends BaseFragment<PhotoFragment.Builder> imp
         mParams = state.getParcelable(PhotoParams.EXTRA_CARD_PARAMS);
     }
 
-    public static final class Builder extends BaseBuilder<IProxy> {
+    public static final class Builder extends BaseBuilder<PhotoProxy> {
 
         OnPhotoChangeListener mUploadListener;
         private String mPhotoUrl;

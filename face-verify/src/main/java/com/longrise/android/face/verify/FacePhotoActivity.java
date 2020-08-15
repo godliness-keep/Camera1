@@ -4,16 +4,22 @@ import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.os.Bundle;
+import android.os.Handler;
+import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Base64;
 import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
 
 import com.longrise.android.face.PhotoFragment;
+import com.longrise.android.face.PhotoProxy;
 import com.longrise.android.face.verify.assist.VerifyHelper;
 import com.longrise.android.face.verify.verify.PhotoParams;
+
+import java.io.ByteArrayOutputStream;
 
 /**
  * Created by godliness on 2020-08-05.
@@ -22,11 +28,10 @@ import com.longrise.android.face.verify.verify.PhotoParams;
  */
 public final class FacePhotoActivity extends AppCompatActivity implements View.OnClickListener {
 
-    private static final String TAG = "FacePhotoActivity";
-
+    private PhotoProxy mProxy;
     private PhotoParams mParams;
     /**
-     * 标记当前是否切换过图片
+     * 标记当前是否切换过照片
      */
     private boolean mChanged;
 
@@ -41,7 +46,7 @@ public final class FacePhotoActivity extends AppCompatActivity implements View.O
         setContentView(R.layout.moduleface_activity_face_photo);
         initView();
 
-        new PhotoFragment.Builder(this)
+        mProxy = new PhotoFragment.Builder(this)
                 .photoUrl(mParams.mCardUrl)
                 .tips(mParams.mTips)
                 .onPhotoChangeListener(mPhotoChangeListener)
@@ -67,7 +72,8 @@ public final class FacePhotoActivity extends AppCompatActivity implements View.O
 
     private void faceVerifyOnSuccess() {
         this.mChanged = true;
-        Log.e(TAG, "faceVerifyOnSuccess");
+
+        Log.e("faceVerifyOnSuccess: ", "faceVerifyOnSuccess");
     }
 
     @Override
@@ -80,8 +86,35 @@ public final class FacePhotoActivity extends AppCompatActivity implements View.O
         @Override
         public void toVerify(@NonNull Bitmap src) {
             FaceVerifyActivity.openFaceVerify(FacePhotoActivity.this);
+            initVerifyListener();
         }
     };
+
+    private void initVerifyListener() {
+        FaceMatchRegistry.getRegistry().registerUploadListener(new FaceMatchRegistry.FaceUploadListener() {
+            @Override
+            public void onUploadFacePhoto(String base64, @NonNull final FaceVerifyProxy.FaceUploadCallback callback) {
+                final Bitmap currentPhoto = mProxy.getCurrentPhoto();
+                final ByteArrayOutputStream bos = new ByteArrayOutputStream();
+                currentPhoto.compress(Bitmap.CompressFormat.JPEG, 75, bos);
+                final String currentBase64 = Base64.encodeToString(bos.toByteArray(), Base64.DEFAULT);
+                new Handler().postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        callback.uploadFaceSuccess("123");
+                    }
+                }, 2000);
+            }
+        });
+
+        FaceMatchRegistry.getRegistry().registerMatchListener(new FaceMatchRegistry.FaceMatchListener() {
+            @Override
+            public void onMatchResult(String id, @NonNull FaceVerifyProxy.FaceMatchCallback callback) {
+                // todo 在这里完善查询匹配结果
+                callback.faceMatchSuccess("你个小糕子，识别成功了");
+            }
+        });
+    }
 
     private void initView() {
         final TextView title = findViewById(R.id.tv_title);
